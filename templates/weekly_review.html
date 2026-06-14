@@ -1,0 +1,20 @@
+{% extends 'base.html' %}{% block title %}Weekly Review{% endblock %}{% block content %}
+<section class="card hero v11-review-hero"><div><p class="eyebrow">Coach-style weekly review</p><h2>{{review.start}} → {{review.end}}</h2><p class="muted">Wins, risks and recommendations based on workouts, recovery, compliance and progression.</p></div><div class="week-score"><b>{{review.week_score}}</b><span>Week Score</span></div></section><br>
+<section class="v11-score-grid">
+  <article class="card review-stat"><small>Training compliance</small><b>{{review.compliance}}%</b><p>{{review.workout_count}} / {{review.planned}} planned sessions</p></article>
+  <article class="card review-stat"><small>Overall compliance</small><b>{{review.compliance_engine.overall}}%</b><p>{{review.compliance_engine.label}}</p></article>
+  <article class="card review-stat"><small>Volume</small><b>{{review.volume}}</b><p>estimated kg volume</p></article>
+  <article class="card review-stat"><small>XP earned</small><b>{{review.xp}}</b><p>this week</p></article>
+</section><br>
+<section class="compliance-engine-grid">{% for c in review.compliance_engine.categories %}<article class="card compliance-card"><div class="section-head"><div><p class="eyebrow">{{c.label}}</p><h3>{{c.rate}}%</h3></div><b>{{c.done}}/{{c.target}}</b></div><div class="mini-progress"><span style="width:{{c.rate}}%"></span></div><p class="muted">{{c.hint}}</p></article>{% endfor %}</section><br>
+<div class="v11-review-columns">
+  <section class="card"><h3>Wins</h3><div class="v10-list">{% for x in review.wins %}<div><span>✓</span><p>{{x}}</p></div>{% endfor %}</div></section>
+  <section class="card"><h3>Risks</h3><div class="v10-list risk-list">{% for x in review.risks %}<div><span>!</span><p>{{x}}</p></div>{% endfor %}</div></section>
+  <section class="card"><h3>Recommendations</h3><div class="v10-list">{% for x in review.recommendations %}<div><span>→</span><p>{{x}}</p></div>{% endfor %}</div></section>
+</div><br>
+<div class="v10-two-col">
+  <section class="card"><div class="section-head"><div><p class="eyebrow">Smart Today Plan</p><h3>{{smart_plan.title}}</h3></div><span class="tone-pill {{smart_plan.tone}}">{{smart_plan.tone}}</span></div><p class="muted">{{smart_plan.action}}</p></section>
+  <section class="card"><div class="section-head"><div><p class="eyebrow">Weekly MVP</p><h3>{% if review.weekly_mvp %}{{review.weekly_mvp.name}}{% else %}Not enough data yet{% endif %}</h3></div></div><p class="muted">{% if review.weekly_mvp %}{{review.weekly_mvp.display}} · {{review.weekly_mvp.date}}{% else %}Log a few sessions to highlight your best movement of the week.{% endif %}</p></section>
+</div><br>
+<section class="card"><h3>Workouts this week</h3><div class="v10-table">{% for w in review.workouts %}<a href="/workouts/{{w.id}}"><span>{{w.date}}</span><b>{{w.name}}</b><em>{{w.duration_min}} min</em></a>{% else %}<p class="muted">No workouts logged this week yet.</p>{% endfor %}</div></section>
+{% endblock %}

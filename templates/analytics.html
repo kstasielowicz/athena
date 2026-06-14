@@ -1,0 +1,22 @@
+{% extends 'base.html' %}{% block title %}Analytics Center{% endblock %}{% block content %}
+<div class="analytics-stack">
+  <section class="card"><p class="eyebrow">ATHENA heatmap</p><h2>Training consistency</h2><div class="heatmap analytics-heat compact-heatmap">{% for d in heat %}<span class="heat l{{d.level}}" data-tooltip="{{d.date}} - {{d.count}} workout{% if d.count != 1 %}s{% endif %}" title="{{d.date}} - {{d.count}} workouts"></span>{% endfor %}</div><p class="muted">Compact heatmap - hover a cell for exact training count.</p></section>
+
+  <div class="grid cols-2 analytics-grid">
+    <section class="card" id="bodyweight"><div class="section-head"><div><p class="eyebrow">Bodyweight center</p><h2>Weight trend</h2></div><span class="pill green">{{bodyweight_center.current or '-'}} kg</span></div><div class="metric-row"><span><b>{{bodyweight_center.first or '-'}}</b><small>First</small></span><span><b>{{bodyweight_center.current or '-'}}</b><small>Current</small></span><span><b>{{bodyweight_center.trend}}</b><small>Trend kg</small></span></div><div class="mini-chart tooltip-chart">{% for b in bodyweight %}<div style="height:{{ ((b.bodyweight or 0)-70)*6 + 30 }}px" data-tooltip="{{b.date}} - {{b.bodyweight}} kg" title="{{b.date}} - {{b.bodyweight}} kg"><span>{{b.bodyweight}}</span></div>{% endfor %}</div><p class="muted">Bodyweight has been merged into Analytics, so training load, consistency and weight changes live in one place.</p></section>
+    <section class="card"><p class="eyebrow">Muscle groups</p><h2>Training distribution</h2>{% for w in balance_warnings %}<div class="balance-warning {{w.level}}"><b>{{w.title}}</b><span>{{w.text}}</span></div>{% endfor %}{% for m in muscles %}<div class="bar-row" data-tooltip="{{m.muscle}} - {{m.volume}} training score" title="{{m.muscle}} - {{m.volume}}"><span>{{m.muscle}}</span><div><b style="width:{{m.pct}}%"></b></div><em>{{m.volume}}</em></div>{% endfor %}</section>
+  </div>
+
+  <section class="card"><p class="eyebrow">Session score formula</p><h2>Recent session scores</h2><p class="muted">Formula: readiness 35% + focus 25% + low fatigue 20% + mood 15% + duration discipline 5%.</p><table><tr><th>Date</th><th>Workout</th><th>Score</th><th>Mood</th><th>Readiness</th><th>Fatigue</th></tr>{% for w in workouts %}<tr><td>{{w.date}}</td><td>{{w.name}}</td><td><span class="pill green">{{w.session_score}}/100</span></td><td>{{w.mood}}</td><td>{{w.readiness}}</td><td>{{w.fatigue}}</td></tr>{% endfor %}</table></section>
+
+  <div class="grid cols-2 analytics-grid">
+    <section class="card"><p class="eyebrow">Analytics 2.0</p><h2>Strength trends</h2>{% for t in strength_trends %}<div class="trend-row"><b>{{t.name}}</b><span class="pill {{'green' if t.direction=='up' else 'soft'}}">{{t.delta}}</span><small>{{t.first}} → {{t.last}}</small></div>{% else %}<p class="muted">Log at least two sessions for an exercise to see trend direction.</p>{% endfor %}</section>
+    <section class="card"><p class="eyebrow">Volume trends</p><h2>Monthly training load</h2>{% for v in volume_trends %}<div class="bar-row"><span>{{v.period}}</span><div><b style="width:{{ [100, (v.volume/100)|round(0)]|min }}%"></b></div><em>{{v.volume|round(0)}} kg</em></div>{% else %}<p class="muted">No volume data yet.</p>{% endfor %}</section>
+  </div>
+  <div class="grid cols-3 analytics-grid">
+    <section class="card"><p class="eyebrow">PR Center</p><h2>Best outputs</h2>{% for r in pr_center %}<a class="record-mini nav-link" href="/workouts/{{r.workout_id}}"><small>{{r.type}}</small><b>{{r.name}}</b><span>{{r.display}}</span></a>{% else %}<p class="muted">No PRs yet.</p>{% endfor %}</section>
+    <section class="card"><p class="eyebrow">Exercise frequency</p><h2>Most trained</h2>{% for e in exercise_frequency %}<div class="trend-row"><b>{{e.name}}</b><span>{{e.sessions}} sessions</span><small>{{e.muscle_group}}</small></div>{% else %}<p class="muted">No exercise frequency yet.</p>{% endfor %}</section>
+    <section class="card"><p class="eyebrow">Gamification</p><h2>Level {{gamification.level}}</h2><p class="muted">{{gamification.xp}} XP total. {{gamification.next}} XP to next level.</p><div class="xp-bar"><b style="width:{{(gamification.progress/250*100)|round(0)}}%"></b></div>{% for b in gamification.badges %}<div class="badge-row {{'unlocked' if b.unlocked else ''}}"><b>{{b.title}}</b><span>{{'Unlocked' if b.unlocked else 'Locked'}}</span></div>{% endfor %}</section>
+  </div>
+</div>
+{% endblock %}

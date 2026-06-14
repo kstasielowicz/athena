@@ -1,0 +1,40 @@
+{% extends 'base.html' %}{% block title %}Goals & Achievements{% endblock %}{% block content %}
+<div class="goals-page">
+  <section class="card goal-form-card"><h3>Add goal</h3><form method="post" class="goal-create-form"><label>Title</label><input name="title" required><label>Metric</label><input name="metric" placeholder="Pull Up, RIS UPPER, Plank"><div class="form-grid two"><div><label>Target</label><input name="target" type="number" step="0.1" required></div><div><label>Current</label><input name="current" type="number" step="0.1"></div></div><label>Unit</label><input name="unit" placeholder="kg, pts, sec"><label>Notes</label><textarea name="notes"></textarea><button class="primary">Save goal</button></form></section>
+
+  <section class="card goals-list-card"><div class="section-head"><div><h3>Goals</h3><p class="muted">Clean goal cards with quick status actions and modal editing.</p></div></div>
+    <div class="goals-clean-grid">
+      {% for g in rows %}{% set pct = (g.current / g.target * 100) if g.target else 0 %}
+      <article class="goal-clean-card {% if g.status == 'Completed' %}completed{% endif %}">
+        <div class="goal-clean-top"><div><small>{{g.metric}}</small><h3>{{g.title}}</h3></div><span class="pill {% if g.status == 'Completed' %}green{% else %}soft{% endif %}">{{g.status or 'Active'}}</span></div>
+        <div class="goalbar"><b style="width:{{ [pct,100]|min }}%"></b></div>
+        <div class="goal-values"><span><b>{{'%.1f'|format(g.current or 0)}}</b> current</span><span><b>{{'%.1f'|format(g.target or 0)}}</b> target</span><span><b>{{g.unit}}</b> unit</span></div>
+        {% if g.notes %}<p class="goal-note">{{g.notes}}</p>{% endif %}
+        <div class="goal-clean-actions">
+          <button class="btn icon-btn" type="button" onclick="openGoalModal('goalEdit{{g.id}}')">✎ Edit</button>
+          <form method="post" action="{{url_for('goal_update', gid=g.id)}}" class="inline-action">
+            {% if g.status == 'Completed' %}<button class="btn" name="action" value="reopen">Reopen</button>{% else %}<button class="primary" name="action" value="complete">Mark completed</button>{% endif %}
+          </form>
+        </div>
+      </article>
+      <div id="goalEdit{{g.id}}" class="modal"><div class="modal-panel goal-modal-panel"><button class="x" type="button" onclick="closeGoalModal('goalEdit{{g.id}}')">×</button><p class="eyebrow">Edit goal</p><h2>{{g.title}}</h2>
+        <form method="post" action="{{url_for('goal_update', gid=g.id)}}" class="goal-modal-form">
+          <label>Title</label><input name="title" value="{{g.title}}">
+          <label>Metric</label><input name="metric" value="{{g.metric}}">
+          <div class="form-grid two"><div><label>Current</label><input name="current" type="number" step="0.1" value="{{g.current}}"></div><div><label>Target</label><input name="target" type="number" step="0.1" value="{{g.target}}"></div></div>
+          <div class="form-grid two"><div><label>Unit</label><input name="unit" value="{{g.unit}}"></div><div><label>Status</label><select name="status"><option {% if g.status!='Completed' %}selected{% endif %}>Active</option><option {% if g.status=='Completed' %}selected{% endif %}>Completed</option></select></div></div>
+          <label>Notes</label><textarea name="notes">{{g.notes}}</textarea>
+          <button class="primary" name="action" value="save">Save changes</button>
+        </form>
+      </div></div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+<section class="card"><h3>Achievements</h3><div class="achievement-grid">{% for title, ok, desc in achievements %}<div class="achievement {% if ok %}unlocked{% endif %}"><b>{{title}}</b><span>{{desc}}</span></div>{% endfor %}</div></section>
+<script>
+function openGoalModal(id){const modal=document.getElementById(id); if(modal.parentElement!==document.body){document.body.appendChild(modal);} modal.classList.add('show')}
+function closeGoalModal(id){document.getElementById(id).classList.remove('show')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))})
+</script>
+{% endblock %}

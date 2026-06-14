@@ -1,0 +1,66 @@
+{% extends 'base.html' %}{% block title %}Progressions{% endblock %}{% block content %}
+<section class="library-hero progress-v11-hero card hero">
+  <div>
+    <p class="eyebrow">Exercise Intelligence</p>
+    <h2>Progression Library</h2>
+    <p class="muted">Clean progression cards grouped by exercise. Search, filter and use them as a planning layer for skills, substitutions and long-term development.</p>
+  </div>
+  <div class="tag-row">
+    <span class="pill green">{{groups|length}} paths</span>
+    <span class="pill soft">Exercise Library 3.0 style</span>
+  </div>
+</section>
+
+<section class="card progress-filter-card">
+  <div class="exercise-filter-v11 progress-filter-v11">
+    <input id="progressSearch" placeholder="Search progression, exercise, muscle...">
+    <select id="progressMuscle"><option value="">All muscles</option>{% for g in groups|sort(attribute='exercise.muscle_group') %}<option value="{{g.exercise.muscle_group}}">{{g.exercise.muscle_group}}</option>{% endfor %}</select>
+    <select id="progressType"><option value="">All tracking</option>{% for g in groups|sort(attribute='exercise.exercise_type') %}<option value="{{g.exercise.exercise_type}}">{{g.exercise.exercise_type}}</option>{% endfor %}</select>
+  </div>
+</section>
+
+<section class="progress-library-grid" id="progressGrid">
+{% for g in groups %}
+  <article class="card progression-card-v11" data-progress-card data-search="{{(g.exercise.name ~ ' ' ~ g.exercise.muscle_group ~ ' ' ~ g.exercise.exercise_type ~ ' ' ~ (g.steps|map(attribute='title')|join(' ')))|lower}}" data-muscle="{{g.exercise.muscle_group}}" data-type="{{g.exercise.exercise_type}}">
+    <div class="progress-card-head">
+      <div>
+        <p class="eyebrow">{{g.exercise.muscle_group}}</p>
+        <h3>{{g.exercise.name}}</h3>
+        <div class="tag-row"><span class="pill green">{{g.exercise.exercise_type}}</span><span class="pill soft">{{g.steps|length}} steps</span></div>
+      </div>
+      <div class="progress-orb">{{g.steps|length}}</div>
+    </div>
+    {% if g.steps %}
+    <div class="progression-path-v11">
+      {% for st in g.steps %}
+      <div class="progression-node-v11">
+        <span>{{st.step_order}}</span>
+        <div><b>{{st.title}}</b><small>{{st.description or 'Progression checkpoint'}}</small></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty compact">No progression path yet.</div>
+    {% endif %}
+  </article>
+{% endfor %}
+</section>
+
+<script>
+(function(){
+  const search=document.getElementById('progressSearch');
+  const muscle=document.getElementById('progressMuscle');
+  const type=document.getElementById('progressType');
+  const cards=Array.from(document.querySelectorAll('[data-progress-card]'));
+  function filter(){
+    const q=(search.value||'').toLowerCase().trim();
+    const m=muscle.value; const t=type.value;
+    cards.forEach(c=>{
+      const ok=(!q || c.dataset.search.includes(q)) && (!m || c.dataset.muscle===m) && (!t || c.dataset.type===t);
+      c.style.display=ok?'':'none';
+    });
+  }
+  [search,muscle,type].forEach(el=>el&&el.addEventListener(el.tagName==='INPUT'?'input':'change',filter));
+})();
+</script>
+{% endblock %}

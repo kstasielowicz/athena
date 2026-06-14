@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block title %}RIS History{% endblock %}{% block content %}
+<section class="card"><div class="workout-head"><div><p class="eyebrow">Relative strength trend</p><h2>Best RIS {{data.best|round(1)}}</h2><p class="muted">History of ALL-4 and UPPER calculations saved from the RIS Lab.</p></div><a class="primary nav-link" href="/ris">Calculate RIS</a></div></section>
+<section class="card"><h3>RIS progress</h3><div class="chart-bars tall">{% set maxv = data.best if data.best else 100 %}{% for r in data.rows %}<div class="chart-bar" title="{{r.date}} - {{r.ris_type}} - {{r.ris_score|round(1)}}"><span style="height:{{(r.ris_score / maxv * 100)|round}}%"></span><small>{{r.date[5:]}}</small></div>{% endfor %}</div></section>
+<section class="card"><table><tr><th>Date</th><th>Type</th><th>Bodyweight</th><th>Total</th><th>RIS</th><th>Category</th></tr>{% for r in data.rows|reverse %}<tr><td>{{r.date}}</td><td>{{r.ris_type}}</td><td>{{r.bodyweight}}</td><td>{{r.total}}</td><td>{{r.ris_score|round(1)}}</td><td>{{r.category}}</td></tr>{% endfor %}</table></section>
+{% endblock %}

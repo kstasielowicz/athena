@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block title %}Personal Records{% endblock %}{% block content %}
+<div class="card hero"><p class="eyebrow">ATHENA performance vault</p><h2>Personal Records</h2><p class="muted">Automatic best results across different exercise types. Every PR links back to the exact workout where it happened.</p></div><br>
+<div class="record-grid">
+{% for r in records %}<div class="record-card"><small>{{r.type}}</small><h3>{{r.name}}</h3><b>{{r.display}}</b><p class="muted">{{r.workout_date}} - {{r.workout_name}}</p><a class="btn nav-link" href="{{url_for('workout_detail', wid=r.workout_id)}}">Open PR workout</a></div>{% else %}<div class="empty">No records yet. Log a workout first.</div>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}{% block title %}Quests{% endblock %}{% block content %}
+<section class="card hero quest-hero">
+  <p class="eyebrow">ATHENA Gamification</p>
+  <h2>Quest System</h2>
+  <p class="muted">Automatic objectives for consistency, recovery and progression. ATHENA now completes supported quests when the right training data appears.</p>
+</section><br>
+
+<section class="grid cols-4 quest-stats">
+  <div class="card stat"><small>Level</small><br><b>{{gamification.level}}</b></div>
+  <div class="card stat"><small>Total XP</small><br><b>{{gamification.xp}}</b></div>
+  <div class="card stat"><small>Next level</small><br><b>{{gamification.next}}</b></div>
+  <div class="card stat"><small>Mission XP</small><br><b>+{{mission.xp}}</b></div>
+</section><br>
+
+<div class="quest-layout">
+  <form class="card quest-create-card" method="post">
+    <p class="eyebrow">Create</p>
+    <h3>New manual quest</h3><p class="muted">Automatic starter quests update themselves. Use this form for custom goals.</p>
+    <label>Title</label><input name="title" required placeholder="Complete 3 pull sessions">
+    <label>Description</label><textarea name="description" placeholder="What should the athlete achieve?"></textarea>
+    <div class="form-grid two">
+      <div><label>Type</label><select name="quest_type"><option>Weekly</option><option>Daily</option><option>Performance</option><option>Recovery</option></select></div>
+      <div><label>Target</label><input name="target" type="number" value="1"></div>
+    </div>
+    <label>XP reward</label><input name="xp_reward" type="number" value="50">
+    <button class="primary">Create quest</button>
+  </form>
+
+  <section class="quest-board">
+    {% for q in quests %}
+    <article class="card quest-card clean-card {% if q.status=='Completed' %}completed{% endif %}">
+      <div class="card-accent"></div>
+      <div class="quest-card-head">
+        <div>
+          <span class="pill {% if q.status=='Completed' %}green{% else %}soft{% endif %}">{{q.quest_type}}</span>{% if q.is_auto %}<span class="pill green">Auto · {{q.auto_label}}</span>{% else %}<span class="pill">Manual</span>{% endif %}
+          <h3>{{q.title}}</h3>
+        </div>
+        <span class="quest-status">{{'Auto-completed' if q.status=='Completed' and q.is_auto else q.status}}</span>
+      </div>
+      <p class="muted quest-description">{{q.description or 'No description added yet.'}}</p>
+      <div class="quest-progress-block">
+        <div class="quest-progress-top"><span>{{q.live_current}} / {{q.target}}</span><b>{{q.pct}}%</b></div>
+        <div class="mini-progress"><span style="width:{{q.pct}}%"></span></div>
+      </div>
+      <div class="quest-footer">
+        <span class="pill green">+{{q.xp_reward}} XP</span>
+        {% if q.status!='Completed' and not q.is_auto %}
+        <form method="post" action="/quests/{{q.id}}/complete"><button class="primary tiny">Complete</button></form>
+        {% elif q.status!='Completed' and q.is_auto %}
+        <span class="pill">Waiting for data</span>
+        {% else %}
+        <span class="pill">Completed</span>
+        {% endif %}
+      </div>
+    </article>
+    {% else %}
+    <div class="card empty">No quests yet. Create a daily, weekly or performance objective.</div>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

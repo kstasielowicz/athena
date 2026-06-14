@@ -1,0 +1,12 @@
+{% extends 'base.html' %}{% block title %}Onboarding{% endblock %}{% block content %}
+<section class="card hero v10-hero"><div><p class="eyebrow">ATHENA Setup</p><h2>Build your athlete profile foundation</h2><p class="muted">These answers shape Smart Today Plan, recovery guidance, program suggestions and achievement pacing.</p></div><span class="status-pill">{{'Completed' if onboarding.completed else 'Not completed'}}</span></section><br>
+<form method="post" class="card onboarding-grid">
+  <label><span>Primary goal</span><select name="primary_goal"><option {{'selected' if onboarding.primary_goal=='Strength'}}>Strength</option><option {{'selected' if onboarding.primary_goal=='Hypertrophy'}}>Hypertrophy</option><option {{'selected' if onboarding.primary_goal=='Street Workout'}}>Street Workout</option><option {{'selected' if onboarding.primary_goal=='Recovery'}}>Recovery</option><option {{'selected' if onboarding.primary_goal=='Body recomposition'}}>Body recomposition</option></select></label>
+  <label><span>Experience</span><select name="experience"><option {{'selected' if onboarding.experience=='Beginner'}}>Beginner</option><option {{'selected' if onboarding.experience=='Intermediate'}}>Intermediate</option><option {{'selected' if onboarding.experience=='Advanced'}}>Advanced</option></select></label>
+  <label><span>Training days / week</span><input type="number" min="1" max="7" name="training_days" value="{{onboarding.training_days}}"></label>
+  <label><span>Equipment</span><input name="equipment" value="{{onboarding.equipment}}" placeholder="Gym, rings, barbell, home setup..."></label>
+  <label class="wide"><span>Preferred style</span><input name="preferred_style" value="{{onboarding.preferred_style}}" placeholder="Strength + skill, hypertrophy, streetlifting..."></label>
+  <div class="wide onboarding-summary"><b>What ATHENA uses this for</b><p>Daily recommendations, deload detection sensitivity, weekly review context, quest selection and future program templates.</p></div>
+  <button class="primary wide">Save onboarding</button>
+</form>
+{% endblock %}

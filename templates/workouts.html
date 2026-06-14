@@ -1,0 +1,26 @@
+{% extends 'base.html' %}{% block title %}Workout Timeline{% endblock %}{% block content %}
+<section class="card workout-hero clean-workouts-hero">
+  <div class="workout-head">
+    <div><p class="eyebrow">ATHENA timeline</p><h2>Training history</h2><p class="muted">Clean, searchable history with compact consistency preview and editable workout details.</p></div>
+    <a class="primary" href="/workouts/new">+ New workout</a>
+  </div>
+  <form class="history-filters compact-search" method="get">
+    <input name="q" value="{{search or ''}}" placeholder="Search by name, date, routine or notes...">
+    <select name="source"><option value="">All sources</option><option value="ATHENA" {% if source=='ATHENA' %}selected{% endif %}>ATHENA</option><option value="HEVY" {% if source=='HEVY' %}selected{% endif %}>HEVY</option></select>
+    <button class="btn">Search</button><a class="btn" href="/workouts">Reset</a>
+  </form>
+</section>
+<section class="card heatmap-strip-card">
+  <div class="heatmap-strip-head"><div><h3>Consistency</h3><p class="muted">Last 91 days. Hover cells for details.</p></div><span class="pill green">{{rows|length}} visible sessions</span></div>
+  <div class="heatmap strip">{% for d in heat %}<span class="heat l{{d.level}}" data-tooltip="{{d.date}} - {{d.count}} workout{% if d.count != 1 %}s{% endif %}" title="{{d.date}} - {{d.count}} workouts"></span>{% endfor %}</div>
+</section>
+<section class="workout-list-modern">
+{% for w in rows %}
+  <article class="workout-row-card">
+    <div class="date-block"><b>{{w.date[8:10]}}</b><span>{{w.date[5:7]}}/{{w.date[0:4]}}</span></div>
+    <div class="workout-row-main"><small>{{w.routine_name or 'Manual session'}} - {{w.source}}</small><h3>{{w.name}}</h3><p>{{w.notes or 'No notes saved for this workout.'}}</p></div>
+    <div class="workout-metrics"><span class="pill green">{{w.session_score}}/100</span><span class="pill">{{w.exercise_count}} exercises</span><span class="pill">{{w.set_count}} sets</span><span class="pill soft">{{'%.0f'|format(w.volume or 0)}} kg</span></div>
+  <div class="action-row"><a class="btn tiny" href="/workouts/{{w.id}}">Edit</a><a class="primary tiny" href="/workouts/{{w.id}}/execute">Execute</a><form method="post" action="/workouts/{{w.id}}/duplicate"><button class="btn tiny">Duplicate</button></form></div></article>
+{% else %}<div class="empty">No workouts match this search.</div>{% endfor %}
+</section>
+{% endblock %}

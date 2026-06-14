@@ -1,0 +1,49 @@
+{% extends 'base.html' %}{% block title %}Coaching Module{% endblock %}{% block content %}
+<section class="card hero coaching-hero">
+  <div class="workout-head">
+    <div>
+      <p class="eyebrow">Locked future module</p>
+      <h2>Coach-led training is coming to ATHENA</h2>
+      <p class="muted">ATHENA stays a standalone athlete platform. This module is a preview of a future upgrade where athletes will be able to train under a coach, and experienced users may eventually manage athletes as coaches.</p>
+    </div>
+    <span class="pill">Locked / in development</span>
+  </div>
+</section>
+
+<div class="grid cols-3 coaching-grid">
+  <div class="card feature-card">
+    <p class="eyebrow">For athletes</p>
+    <h3>Train under a coach</h3>
+    <p class="muted">Receive assigned programs, weekly check-ins, session feedback and progress guidance inside ATHENA.</p>
+  </div>
+  <div class="card feature-card">
+    <p class="eyebrow">For future coaches</p>
+    <h3>Coach capability</h3>
+    <p class="muted">A future path for managing athletes, assigning programs and reacting to training signals without adding a separate coach dashboard yet.</p>
+  </div>
+  <div class="card advisor {{signal.tone}}">
+    <p class="eyebrow">Coach Signal preview</p>
+    <h3>{{signal.title}}</h3>
+    <p>{{signal.text}}</p>
+  </div>
+</div>
+
+<section class="card roadmap-panel">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Planned scope</p>
+      <h3>What this module may unlock later</h3>
+    </div>
+    <span class="pill soft">No separate coach dashboard in this version</span>
+  </div>
+  <div class="capability-grid">
+    <span>Coach-athlete relationship</span>
+    <span>Program assignment</span>
+    <span>Weekly check-ins</span>
+    <span>Session feedback</span>
+    <span>Messaging</span>
+    <span>Compliance insights</span>
+  </div>
+  <p class="muted">For now, this remains a clear product-direction screen. The current ATHENA build focuses on the athlete experience first.</p>
+</section>
+{% endblock %}

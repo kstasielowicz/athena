@@ -1,0 +1,22 @@
+<div class="form-grid">
+  <div><label>Name</label><input name="name" required value="{{ex.name if ex is defined else ''}}"></div>
+  <div><label>Muscle group</label><select name="muscle_group">{% for m in MUSCLES %}<option {% if ex is defined and ex.muscle_group==m %}selected{% endif %}>{{m}}</option>{% endfor %}</select></div>
+  <div><label>Exercise type</label><select name="exercise_type" onchange="syncMetricHint(this)">{% for t in EXERCISE_TYPES %}<option {% if ex is defined and ex.exercise_type==t %}selected{% endif %}>{{t}}</option>{% endfor %}</select></div>
+  <div><label>Metric scheme</label><input name="metric_hint" value="{{ex.metric_hint if ex is defined and ex.metric_hint else 'Weight + reps'}}"></div>
+  <div><label>Equipment</label><input name="equipment" value="{{ex.equipment if ex is defined else 'Barbell'}}"></div>
+  <div><label>Difficulty</label><select name="difficulty">{% for d in DIFFICULTY %}<option {% if ex is defined and ex.difficulty==d %}selected{% endif %}>{{d}}</option>{% endfor %}</select></div>
+  <div><label>Primary muscle</label><input name="primary_muscle" value="{{ex.primary_muscle if ex is defined else ''}}"></div>
+  <div><label>Secondary muscles</label><input name="secondary_muscles" value="{{ex.secondary_muscles if ex is defined else ''}}"></div>
+  <div><label>RIS tag</label><input name="ris_tag" value="{{ex.ris_tag if ex is defined else 'Strength'}}"></div>
+  <div><label>Movement pattern</label><input name="movement_pattern" value="{{ex.movement_pattern if ex is defined and ex.movement_pattern else 'Horizontal push / Pull / Squat'}}"></div>
+  <div><label>Media URL</label><input name="media_url" value="{{ex.media_url if ex is defined and ex.media_url else ''}}" placeholder="YouTube/GIF/demo link"></div>
+  <div><label>Exercise image</label><input name="image" type="file" accept="image/*"></div>
+</div>
+<label>Description</label><textarea name="description">{{ex.description if ex is defined else ''}}</textarea>
+<label>Instructions</label><textarea name="instructions">{{ex.instructions if ex is defined else ''}}</textarea>
+<label>Coaching cues</label><textarea name="cues">{{ex.cues if ex is defined else ''}}</textarea>
+<label>Common mistakes</label><textarea name="common_mistakes">{{ex.common_mistakes if ex is defined else ''}}</textarea>
+<label>Internal notes</label><textarea name="notes">{{ex.notes if ex is defined else ''}}</textarea>
+<script>
+function syncMetricHint(sel){const map={Strength:'Weight + reps',Bodyweight:'Additional weight + reps',Timed:'Duration seconds',Distance:'Load + distance',Cardio:'Duration + distance + calories + heart rate',Interval:'Rounds + work/rest',Mobility:'Duration + notes',Custom:'Custom fields'}; const input=sel.closest('form').querySelector('[name=metric_hint]'); if(input && (!input.value || input.value==='Weight + reps')) input.value=map[sel.value]||'Custom fields';}
+</script>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}{% block title %}ATHENA Roadmap{% endblock %}{% block content %}
+<section class="card hero roadmap-hero">
+  <p class="eyebrow">Stages 1–8</p>
+  <h2>ATHENA product roadmap</h2>
+  <p class="muted">A clearer standalone path: build the athlete platform first, keep coaching as a locked future upgrade, and avoid merging ATHENA into any larger product too early.</p>
+</section>
+
+{% set stages=[
+  ('1','Workout Execution','Built','Live workout mode with set completion, RPE, rest timer, notes and session summary.','Athlete core'),
+  ('2','Athlete Profile','Built','Identity, body metrics, strength metrics, ATHENA level and readiness context.','Athlete core'),
+  ('3','Program Builder','Built','Multi-week training blocks connected to routines and progression planning.','Programming'),
+  ('4','Coach Signal 2.0','Preview built','Readiness, fatigue, compliance and RIS-aware recommendations shown as guidance.','Intelligence'),
+  ('5','Coaching Module','Locked preview','A single future-facing screen for coach-led training and coach capability.','Future module'),
+  ('6','Coach Capability','Planned','Future option to train under someone or eventually operate as a coach. No dashboard yet.','Future module'),
+  ('7','Compliance System','Built','Planned vs completed sessions as a coaching-ready metric.','Analytics'),
+  ('8','Roadmap Page','Built','Visible product direction inside the app with clear stage status.','Product')
+] %}
+
+<div class="roadmap-board">
+  {% for n,t,s,d,g in stages %}
+  <article class="card roadmap-stage {% if 'Built' in s %}done{% elif 'Preview' in s %}preview{% else %}planned{% endif %}">
+    <div class="stage-number">{{n}}</div>
+    <div class="stage-body">
+      <div class="stage-top"><span class="pill soft">{{g}}</span><span class="stage-status">{{s}}</span></div>
+      <h3>{{t}}</h3>
+      <p class="muted">{{d}}</p>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+<section class="card roadmap-next">
+  <p class="eyebrow">Recommended next focus</p>
+  <h3>Make execution feel complete before adding more modules</h3>
+  <div class="capability-grid">
+    <span>Better live workout flow</span>
+    <span>Program calendar view</span>
+    <span>Post-session review</span>
+    <span>Progression suggestions</span>
+  </div>
+</section>
+{% endblock %}

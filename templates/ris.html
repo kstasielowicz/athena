@@ -1,0 +1,79 @@
+{% extends 'base.html' %}{% block title %}RIS Lab{% endblock %}{% block content %}
+<section class="card hero gym-hero">
+  <div class="workout-head">
+    <div><p class="eyebrow">Relative Strength Intelligence</p><h2>ATHENA RIS Calculator</h2><p class="muted">Calculate ALL-4 or UPPER, save the result, and track RIS history directly inside this tab.</p></div>
+    <div class="ris-orb"><span>RIS</span></div>
+  </div>
+</section>
+
+
+<section class="grid cols-2 premium-row education-row">
+  <div class="card info-card">
+    <p class="eyebrow">Human-readable scoring</p>
+    <h3>What is RIS?</h3>
+    <p class="muted">RIS means Relative Strength Intelligence. It compares your tested strength against your bodyweight, so the result is not just “how much you lift”, but how strong you are relative to your size.</p>
+    <div class="formula-card"><b>Simple idea</b><span>RIS = your test total ÷ expected strength for your bodyweight × 100</span></div>
+    <p class="muted">In ATHENA, the expected strength number is produced by a bodyweight curve. Heavier athletes are expected to lift more, but not in a perfectly linear way. UPPER mode uses only pull-up + dip, while ALL-4 uses pull-up + dip + squat + muscle-up.</p>
+  </div>
+  <div class="card info-card">
+    <p class="eyebrow">Training feedback</p>
+    <h3>What is RPE?</h3>
+    <p class="muted">RPE means Rate of Perceived Exertion. It is your subjective difficulty score for a set, saved as a whole number from 1 to 10. ATHENA uses it to understand whether a session was easy, productive, hard, or too close to failure.</p>
+    <div class="level-list compact">
+      <div><b>1-4</b><span>Very easy / warm-up effort</span></div>
+      <div><b>5-6</b><span>Comfortable working sets</span></div>
+      <div><b>7</b><span>Challenging, several reps in reserve</span></div>
+      <div><b>8</b><span>Hard, around 2 reps in reserve</span></div>
+      <div><b>9</b><span>Very hard, around 1 rep in reserve</span></div>
+      <div><b>10</b><span>Maximum effort / no reps left</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="card premium-row">
+  <div class="workout-head"><div><p class="eyebrow">RIS levels</p><h3>How to read your score</h3><p class="muted">These bands are practical product levels, not medical or federation standards. Use them to track direction, not to judge one isolated test.</p></div></div>
+  <div class="ris-level-grid">
+    <div><b>Foundation</b><span>&lt; 70</span><p>Baseline phase. Build technique, consistency and repeatable training weeks.</p></div>
+    <div><b>Developing</b><span>70-84</span><p>Solid momentum. Strength is becoming visible relative to bodyweight.</p></div>
+    <div><b>Strong</b><span>85-99</span><p>Good relative strength. Progression should become more structured.</p></div>
+    <div><b>Advanced</b><span>100-114</span><p>High-performing range. Recovery, fatigue and programming details matter more.</p></div>
+    <div><b>Elite</b><span>115+</span><p>Exceptional range. Small improvements require precise planning and testing standards.</p></div>
+  </div>
+</section>
+
+<div class="grid ris-layout premium-row">
+  <div class="card">
+    <h3>New RIS calculation</h3>
+    <form method="post" id="risForm">
+      <label>Date</label><input name="date" type="date" value="{{today}}">
+      <label>RIS mode</label><select name="ris_type" id="risType"><option value="ALL-4">ALL-4: Pull-up + Dip + Squat + Muscle-up</option><option value="UPPER">UPPER: Pull-up + Dip</option></select>
+      <label>Sex formula</label><select name="sex" id="risSex"><option>Men</option><option>Women</option></select>
+      <label>Bodyweight kg</label><input name="bodyweight" id="risBodyweight" type="number" step="0.1" value="{{latest_weight}}" required>
+      <div class="ris-input-grid"><div><label>Pull-up kg</label><input class="risLift" name="pullup" type="number" step="0.5" value="0"></div><div><label>Dip kg</label><input class="risLift" name="dip" type="number" step="0.5" value="0"></div><div class="all4-only"><label>Squat kg</label><input class="risLift" name="squat" type="number" step="0.5" value="0"></div><div class="all4-only"><label>Muscle-up kg</label><input class="risLift" name="muscleup" type="number" step="0.5" value="0"></div></div>
+      <div class="ris-result-card"><small>Live calculator result</small><div><span>Total</span><b id="risTotal">0 kg</b></div><div><span>RIS</span><b id="risScore">0.0</b></div><div><span>Category</span><b id="risLiveCategory">Foundation</b></div><p id="risFormulaHint">ALL-4 uses the full denominator curve.</p></div>
+      <label>Notes</label><textarea name="notes" placeholder="Testing context, added weight, technique, fatigue, judging standard..."></textarea><br><br>
+      <button class="primary">Save to RIS history</button>
+    </form>
+  </div>
+
+  <div class="grid ris-history-stack">
+    <section class="card">
+      <div class="workout-head"><div><h3>RIS progress</h3><p class="muted">This replaces the old separate RIS History tab.</p></div><span class="pill green">Best: {{history.best|round(1)}}</span></div>
+      {% if history.rows %}<div class="chart-bars tall ris-chart">{% set maxv = history.best if history.best else 100 %}{% for r in history.rows %}<div class="chart-bar" title="{{r.date}} - {{r.ris_type}} - {{r.ris_score|round(1)}}"><span style="height:{{(r.ris_score / maxv * 100)|round}}%"></span><small>{{r.date[5:]}}</small></div>{% endfor %}</div>{% else %}<div class="empty">No RIS tests yet. Save your first calculation to create a strength timeline.</div>{% endif %}
+    </section>
+    <section class="card">
+      <div class="workout-head"><div><h3>RIS history</h3><p class="muted">Saved calculations become your personal strength timeline.</p></div></div>
+      <div class="table-scroll"><table><tr><th>Date</th><th>Mode</th><th>Formula</th><th>Bodyweight</th><th>Total</th><th>RIS</th><th>Category</th><th>Components</th></tr>{% for r in rows %}<tr><td>{{r.date}}</td><td><span class="pill soft">{{r.ris_type or 'ALL-4'}}</span></td><td>{{r.sex}}</td><td>{{r.bodyweight}} kg</td><td>{{r.total}} kg</td><td><b>{{'%.1f'|format(r.ris_score)}}</b></td><td><span class="pill green">{{r.category}}</span></td><td class="muted">PU {{r.pullup or 0}} / DIP {{r.dip or 0}}{% if (r.ris_type or 'ALL-4') != 'UPPER' %} / SQ {{r.squat or 0}} / MU {{r.muscleup or 0}}{% endif %}</td></tr>{% endfor %}</table></div>
+    </section>
+  </div>
+</div>
+
+<div class="grid cols-3 premium-row"><div class="card"><h3>ALL-4</h3><p class="muted">Full test for pull-up, dip, squat and muscle-up. Good as a complete strength profile.</p></div><div class="card"><h3>UPPER</h3><p class="muted">Upper-body streetworkout mode for pull-up + dip sessions.</p></div><div class="card"><h3>History now lives here</h3><p class="muted">No extra sidebar item. RIS Lab contains the calculator, progress chart and saved table.</p></div></div>
+
+<script>
+function denominator(sex,bw,mode){const p=sex==='Women'?{A:164,K:270,B:0.13776,V:57.855,Q:0.37089,scale:.45}:{A:338,K:549,B:0.11354,V:74.777,Q:0.53096,scale:.43};let value=p.A+(p.K-p.A)/(1+p.Q*Math.exp(-p.B*(bw-p.V)));if(mode==='UPPER')value*=p.scale;return value;}
+function category(score){if(score>=115)return 'Elite'; if(score>=100)return 'Advanced'; if(score>=85)return 'Strong'; if(score>=70)return 'Developing'; return 'Foundation';}
+function updateRISMode(){const mode=document.getElementById('risType').value;const sex=document.getElementById('risSex').value;const bw=Number(document.getElementById('risBodyweight').value||0);document.querySelectorAll('.all4-only').forEach(el=>el.style.display=mode==='UPPER'?'none':'block');let total=0;document.querySelectorAll('.risLift').forEach(input=>{if(mode==='UPPER'&&(input.name==='squat'||input.name==='muscleup'))return;total+=Number(input.value||0);});let score=(bw>0&&total>0)?total*100/denominator(sex,bw,mode):0;document.getElementById('risTotal').textContent=total.toFixed(1).replace('.0','')+' kg';document.getElementById('risScore').textContent=score.toFixed(1);document.getElementById('risLiveCategory').textContent=category(score);document.getElementById('risFormulaHint').textContent=mode==='UPPER'?'UPPER is ATHENA two-lift mode: pull-up + dip.':'ALL-4 uses the four-lift structure.';}
+document.querySelectorAll('.risLift,#risType,#risSex,#risBodyweight').forEach(el=>el.addEventListener('input',updateRISMode));document.getElementById('risType').addEventListener('change',updateRISMode);document.getElementById('risSex').addEventListener('change',updateRISMode);updateRISMode();
+</script>
+{% endblock %}

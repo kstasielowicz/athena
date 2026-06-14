@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block title %}Skill Evidence Gallery{% endblock %}{% block content %}
+<section class="card hero"><p class="eyebrow">Skill proof archive</p><h2>Evidence Gallery</h2><p class="muted">All uploaded skill progression evidence in one place. Use it as a visual progress log.</p><a class="btn" href="/skills">Back to Skill System</a></section><br>
+<div class="evidence-gallery-grid">
+{% for r in rows %}
+  <article class="card evidence-gallery-card">
+    {% if r.evidence_image_path %}<img src="{{url_for('static', filename=r.evidence_image_path)}}" alt="Evidence for {{r.title}}">{% else %}<div class="exercise-placeholder large"></div>{% endif %}
+    <div><span class="pill green">{{r.category}}</span><h3>{{r.skill_name}}</h3><p><b>{{r.title}}</b></p><p class="muted">{{r.evidence_note or r.description or 'No note added.'}}</p><small>{{r.evidence_at or 'No date'}}</small></div>
+  </article>
+{% else %}
+  <div class="card empty">No skill evidence yet. Upload proof from a skill step.</div>
+{% endfor %}
+</div>
+{% endblock %}

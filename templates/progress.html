@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block title %}Exercise Progress{% endblock %}{% block content %}
+<section class="card hero"><p class="eyebrow">Performance charts</p><h2>Select exercise</h2><p class="muted">Open any exercise to see best set, trend history and the tracking model used by ATHENA.</p></section>
+<div class="exercise-grid">{% for e in rows %}<a class="exercise-card" href="/progress/{{e.id}}"><img src="{{ url_for('static', filename='img/athena_exercise_lab.svg') }}"><div class="exercise-card-body"><h3>{{e.name}}</h3><p>{{e.muscle_group}} - {{e.exercise_type}}</p><div class="tag-row"><span class="pill green">{{e.metric_hint}}</span></div></div></a>{% endfor %}</div>
+{% endblock %}

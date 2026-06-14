@@ -1,0 +1,37 @@
+<div class="exercise-picker-shell" data-picker="{{ picker_id }}">
+  <input type="hidden" name="{{ hidden_name or 'exercise_id' }}" id="{{ picker_id }}_input" value="{{ default_exercise.id if default_exercise else (exercises[0].id if exercises else '') }}">
+  <button type="button" class="exercise-picker-button" data-open-picker="{{ picker_id }}">
+    <span class="picker-kicker">Selected exercise</span>
+    <strong id="{{ picker_id }}_selected_name">{{ default_exercise.name if default_exercise else (exercises[0].name if exercises else 'No exercises available') }}</strong>
+    <small id="{{ picker_id }}_selected_meta">{{ (default_exercise.exercise_type ~ ' · ' ~ default_exercise.muscle_group ~ ' · ' ~ default_exercise.metric_hint) if default_exercise else ((exercises[0].exercise_type ~ ' · ' ~ exercises[0].muscle_group ~ ' · ' ~ exercises[0].metric_hint) if exercises else 'Create an exercise first') }}</small>
+  </button>
+  <div class="exercise-picker-modal" id="{{ picker_id }}_modal" aria-hidden="true">
+    <div class="exercise-picker-backdrop" data-close-picker="{{ picker_id }}"></div>
+    <div class="exercise-picker-panel" role="dialog" aria-modal="true" aria-label="Choose exercise">
+      <div class="picker-header">
+        <div><p class="eyebrow">Exercise Picker</p><h3>Choose movement</h3><p class="muted">Search, filter, use favorites/recent movements, or jump to substitutes.</p></div>
+        <button type="button" class="btn tiny" data-close-picker="{{ picker_id }}">Close</button>
+      </div>
+      <div class="picker-tools">
+        <input class="picker-search" data-picker-search="{{ picker_id }}" placeholder="Search exercise, muscle, equipment..." autocomplete="off">
+        <select class="picker-filter" data-picker-filter="{{ picker_id }}"><option value="">All muscle groups</option>{% for m in exercises|map(attribute='muscle_group')|unique|sort %}<option value="{{m}}">{{m}}</option>{% endfor %}</select>
+        <select class="picker-type" data-picker-type="{{ picker_id }}"><option value="">All tracking types</option>{% for t in exercises|map(attribute='exercise_type')|unique|sort %}<option value="{{t}}">{{t}}</option>{% endfor %}</select>
+      </div>
+      <div class="picker-tabs" data-picker-tabs="{{ picker_id }}">
+        <button type="button" class="active" data-picker-tab="all">All</button>
+        <button type="button" data-picker-tab="favorites">Favorites</button>
+        <button type="button" data-picker-tab="recent">Recent</button>
+      </div>
+      <div class="picker-list" data-picker-list="{{ picker_id }}">
+        {% for e in exercises %}
+        {% set sub_names = (substitutions.get(e.id, [])|map(attribute='name')|join(', ')) if substitutions is defined else '' %}
+        <button type="button" class="picker-card" data-pick-exercise="{{ picker_id }}" data-id="{{e.id}}" data-name="{{e.name}}" data-meta="{{e.exercise_type}} · {{e.muscle_group}} · {{e.metric_hint}}" data-search="{{(e.name ~ ' ' ~ e.muscle_group ~ ' ' ~ e.equipment ~ ' ' ~ e.exercise_type ~ ' ' ~ e.metric_hint ~ ' ' ~ sub_names)|lower}}" data-muscle="{{e.muscle_group}}" data-type="{{e.exercise_type}}" data-favorite="{{ '1' if favorite_ids is defined and e.id in favorite_ids else '0' }}" data-recent="{{ '1' if recent_ids is defined and e.id in recent_ids else '0' }}">
+          <img src="{{ url_for('static', filename=e.image_path if e.image_path else 'img/bench_press.svg') }}" alt="">
+          <span><strong>{% if favorite_ids is defined and e.id in favorite_ids %}★ {% endif %}{{e.name}}</strong><small>{{e.exercise_type}} · {{e.muscle_group}}</small><em>{{e.metric_hint}}</em>{% if substitutions is defined and substitutions.get(e.id) %}<small class="sub-mini">Subs: {{ substitutions.get(e.id)|map(attribute='name')|join(', ') }}</small>{% endif %}</span>
+        </button>
+        {% endfor %}
+      </div>
+      <p class="muted picker-empty" data-picker-empty="{{ picker_id }}" hidden>No matching exercises. Try another search or clear filters.</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block title %}Bodyweight Center{% endblock %}{% block content %}
+<section class="card"><div class="workout-head"><div><p class="eyebrow">Bodyweight trend</p><h2>{{data.current or '-'}} kg</h2><p class="muted">Trend from first to latest entry: {{data.trend}} kg across {{data.count}} entries.</p></div><a class="btn nav-link" href="/import-hevy">Import Hevy measurements</a></div></section>
+<section class="card"><h3>Timeline</h3><div class="chart-bars">{% set maxv = (data.rows|map(attribute='bodyweight')|list|max) if data.rows else 100 %}{% for r in data.rows %}<div class="chart-bar" title="{{r.date}} - {{r.bodyweight}} kg"><span style="height:{{(r.bodyweight / maxv * 100)|round}}%"></span><small>{{r.date[5:]}}</small></div>{% endfor %}</div></section>
+{% endblock %}

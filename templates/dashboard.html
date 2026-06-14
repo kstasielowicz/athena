@@ -1,0 +1,63 @@
+{% extends 'base.html' %}{% block title %}Dashboard{% endblock %}{% block content %}
+{% set v2 = dashboard_mission_v2() %}
+{% set rank = athlete_rank_from_xp(gamification.xp) %}
+{% set streak2 = streak_system_v2() %}
+<section class="dash20-hero card">
+  <div class="dash20-copy">
+    <p class="eyebrow">ATHENA Performance OS</p>
+    <h1>Good morning, {{display_name or 'Athlete'}} <span class="live-dot"></span></h1>
+    <p class="muted">{{v2.smart.title}} · {{v2.smart.action}}</p>
+    <div class="dash20-actions">
+      {% for a in v2.quick %}<a class="{{'primary' if a.primary else 'btn'}} nav-link" href="{{a.href}}">{{a.label}}</a>{% endfor %}
+    </div>
+  </div>
+  <div class="dash20-score {{daily_score.tone}}"><small>ATHENA Score</small><b>{{daily_score.score}}</b><span>{{daily_score.label}}</span><em>{{'+' if daily_score.delta>=0 else ''}}{{daily_score.delta}} this week</em></div>
+  <div class="dash20-rank"><small>Rank</small><b>{{rank.name}}</b><span>{{gamification.xp}} XP · Level {{gamification.level}}</span><div class="mini-progress"><span style="width:{{rank.progress}}%"></span></div></div>
+</section>
+
+<section class="dash20-grid-main">
+  <article class="card daily-mission20">
+    <div class="section-head"><div><p class="eyebrow">Daily Mission</p><h2>{{mission.workout.name if mission.workout else 'No mission selected'}}</h2><p class="muted">Objectives, smart recommendation and quick actions in one place.</p></div>{% if mission.workout %}<a class="primary tiny nav-link" href="/workouts/{{mission.workout.id}}/execute">Start</a>{% endif %}</div>
+    <div class="mission-list clean">
+      {% for o in mission.objectives[:5] %}<div class="mission-line"><span>{{loop.index}}</span><div><b>{{o.title}}</b><small>{{o.target}}</small></div></div>{% else %}<p class="muted">Create or start a workout to generate today’s mission.</p>{% endfor %}
+    </div>
+  </article>
+
+  <article class="card smart-suggestion20 {{v2.smart.tone}}">
+    <p class="eyebrow">Smart Training Suggestion</p><h2>{{v2.smart.title}}</h2><p>{{v2.smart.action}}</p>
+    <div class="reason-row">{% for r in v2.smart.reasons %}<span>{{r}}</span>{% endfor %}</div>
+  </article>
+
+  <aside class="card alerts20">
+    <div class="section-head"><h3>Smart Alerts</h3></div>
+    {% for a in smart_alerts %}<div class="alert-chip20 {{a.tone}}"><b>{{a.title}}</b><small>{{a.text}}</small></div>{% endfor %}
+  </aside>
+</section>
+
+<section class="dash20-metrics card">
+  {% for name, value in daily_score.parts.items() %}<div class="score-part"><div><b>{{name}}</b><span>{{value}}/100</span></div><i><span style="width:{{value}}%"></span></i></div>{% endfor %}
+</section>
+
+<details class="card widget-control-card dashboard-customizer"><summary><span><b>Customize dashboard</b><em> Pin, unpin and reorder cards</em></span></summary>
+  <form method="post" action="/dashboard/widgets" class="widget-layout-form" id="dashboardWidgetForm">
+    <input type="hidden" name="widget_order" id="widgetOrderInput" value="{{dashboard_widgets.selected|join(',')}}">
+    <div class="widget-picker-row">{% for w in dashboard_widgets.all %}<label class="widget-check" data-widget-option="{{w.key}}"><input type="checkbox" name="widgets" value="{{w.key}}" {% if w.key in dashboard_widgets.selected %}checked{% endif %}><span>{{w.label}}</span><em>{{w.group}}</em></label>{% endfor %}</div>
+    <div class="widget-actions"><span class="muted">Drag cards below to customize your command center.</span><button class="btn tiny" type="submit">Save layout</button></div>
+  </form>
+</details>
+
+<section class="v11-pinned-grid dashboard-sortable clean-dashboard-cards" id="dashboardPinnedGrid">
+  {% for key in dashboard_widgets.selected %}{% set c = dashboard_cards.get(key) %}{% if c %}<article class="card pinned-card sortable-card" draggable="true" data-widget-key="{{key}}"><button type="button" class="drag-handle">⋮⋮</button><small>{{c.label}}</small><strong>{{c.value}}</strong><span>{{c.sub}}</span><a class="mini-card-link nav-link" href="{{c.href}}">Open</a></article>{% endif %}{% endfor %}
+</section>
+
+<section class="dash20-bottom-grid">
+  <article class="card weekly-card stable"><div class="section-head"><div><p class="eyebrow">Weekly Overview</p><h3>Training momentum</h3></div><a class="btn tiny nav-link" href="/weekly-review">Review</a></div><div class="weekly-numbers stable"><span><b>{{weekly.workout_count}}</b><small>Workouts</small></span><span><b>{{weekly.compliance}}%</b><small>Compliance</small></span><span><b>{{weekly.volume|round(0)}}</b><small>Volume</small></span><span><b>{{streak2.current}}</b><small>Streak</small></span></div><div class="heatmap compact stable">{% for d in heat[:42] %}<span class="heat l{{d.level}}" title="{{d.date}} - {{d.count}} workouts"></span>{% endfor %}</div></article>
+  <article class="card goals20"><div class="section-head"><h3>Upcoming Goals</h3><a class="nav-link" href="/goals">Open</a></div>{% for g in v2.goals %}<div class="goal-row20"><div><b>{{g.title}}</b><small>{{g.current}} / {{g.target}} {{g.unit}}</small></div><span>{{g.progress}}%</span></div><div class="mini-progress"><span style="width:{{g.progress}}%"></span></div>{% else %}<p class="muted">Add goals to see them here.</p>{% endfor %}</article>
+  <article class="card clean-achievement-preview stable"><div class="section-head"><h3>Featured Achievements</h3><a class="nav-link" href="/achievements">View all</a></div>{% for b in featured_achievements(4) %}<div class="mini-achievement done"><span>{{b.icon}}</span><div><b>{{b.title}}</b><small>{{b.rarity}} · {{b.description}}</small></div></div>{% else %}<p class="muted">Unlock achievements to feature them here.</p>{% endfor %}</article>
+  <article class="card knowledge-card stable"><div class="section-head"><div><p class="eyebrow">Knowledge Base</p><h3>Training concepts</h3></div></div><div class="info-tip-grid v11-tips"><button type="button" class="info-tip" data-tip="Compliance means completed planned sessions divided by planned sessions."><b>Compliance</b><span>Plan adherence</span></button><button type="button" class="info-tip" data-tip="ATHENA Score combines Recovery, Readiness, Compliance, Fatigue and Sleep."><b>ATHENA Score</b><span>Daily signal</span></button><button type="button" class="info-tip" data-tip="Deload is a planned lower-stress block when fatigue and plateau risk stack."><b>Deload</b><span>Recovery block</span></button></div><p id="dashboardTipText" class="tip-output">Tap a concept to see a short explanation.</p></article>
+</section>
+<script>
+document.querySelectorAll('.info-tip').forEach(btn=>btn.addEventListener('click',()=>{const out=document.getElementById('dashboardTipText'); if(out) out.textContent=btn.dataset.tip;}));
+(function(){const grid=document.getElementById('dashboardPinnedGrid'),form=document.getElementById('dashboardWidgetForm'),orderInput=document.getElementById('widgetOrderInput'); if(!form||!orderInput)return; function orderFromGrid(){return grid?Array.from(grid.querySelectorAll('[data-widget-key]')).map(el=>el.dataset.widgetKey):[]} function checkedKeys(){return Array.from(form.querySelectorAll('input[name="widgets"]:checked')).map(el=>el.value)} function syncOrder(){const ordered=orderFromGrid(); checkedKeys().forEach(k=>{if(!ordered.includes(k))ordered.push(k)}); orderInput.value=ordered.join(',')} form.addEventListener('change',syncOrder); form.addEventListener('submit',syncOrder); if(!grid)return; let dragged=null; grid.addEventListener('dragstart',e=>{const card=e.target.closest('.sortable-card'); if(!card)return; dragged=card; card.classList.add('dragging'); e.dataTransfer.setData('text/plain',card.dataset.widgetKey)}); grid.addEventListener('dragover',e=>{e.preventDefault(); const card=e.target.closest('.sortable-card'); if(!card||card===dragged)return; const rect=card.getBoundingClientRect(); const after=(e.clientY-rect.top)>rect.height/2; grid.insertBefore(dragged,after?card.nextSibling:card); syncOrder()}); grid.addEventListener('dragend',()=>{if(dragged)dragged.classList.remove('dragging'); dragged=null; syncOrder()}); grid.addEventListener('drop',e=>{e.preventDefault();syncOrder()}); syncOrder();})();
+</script>
+{% endblock %}

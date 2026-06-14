@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ATHENA Training OS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div id="pageLoader" class="page-loader"><div class="loader-card"><div class="loader-mark">A</div><b>Loading ATHENA module</b><span>Preparing training data...</span></div></div>
+<aside class="sidebar">
+  <div class="brand"><div class="logo">A</div><div><b>ATHENA</b><span>Strength Intelligence</span></div></div>
+  <nav class="side-nav">
+    <div class="nav-section"><span>Core</span>
+      <a href="/" class="nav-link {% if request.path=='/' %}active{% endif %}">Dashboard</a>
+      <a href="/weekly-review" class="nav-link {% if request.path.startswith('/weekly-review') %}active{% endif %}">Weekly Review</a>
+      <a href="/execute" class="nav-link {% if request.path.startswith('/execute') or (request.path.startswith('/workouts/') and request.path.endswith('/execute')) %}active{% endif %}">Workout Execution</a>
+      <a href="/workouts" class="nav-link {% if request.path.startswith('/workouts') and not request.path.endswith('/execute') %}active{% endif %}">Workouts</a>
+      <a href="/routines" class="nav-link {% if request.path.startswith('/routines') %}active{% endif %}">Routines</a>
+      <a href="/programs" class="nav-link {% if request.path.startswith('/programs') %}active{% endif %}">Program Builder</a>
+    </div>
+    <div class="nav-section"><span>Athlete</span>
+      <a href="/athlete" class="nav-link {% if request.path.startswith('/athlete') %}active{% endif %}">Athlete Profile</a>
+      <a href="/ris" class="nav-link {% if request.path == '/ris' %}active{% endif %}">RIS Lab</a>
+      <a href="/progress" class="nav-link {% if request.path.startswith('/progress') %}active{% endif %}">Progress</a>
+      <a href="/records" class="nav-link {% if request.path.startswith('/records') %}active{% endif %}">Personal Records</a>
+      <a href="/wellness" class="nav-link {% if request.path.startswith('/wellness') %}active{% endif %}">Readiness</a>
+      <a href="/recovery" class="nav-link {% if request.path.startswith('/recovery') %}active{% endif %}">Recovery Center</a>
+      <a href="/intelligence" class="nav-link {% if request.path.startswith('/intelligence') %}active{% endif %}">Athlete Intelligence</a>
+      <a href="/achievements" class="nav-link {% if request.path.startswith('/achievements') %}active{% endif %}">Achievements</a>
+      <a href="/skills" class="nav-link {% if request.path.startswith('/skills') %}active{% endif %}">Skill System</a>
+      <a href="/quests" class="nav-link {% if request.path.startswith('/quests') %}active{% endif %}">Quests</a>
+    </div>
+    <div class="nav-section"><span>Tools</span>
+      <a href="/exercises" class="nav-link {% if request.path.startswith('/exercises') %}active{% endif %}">Exercise Library</a>
+      <a href="/exercise-progressions" class="nav-link {% if request.path.startswith('/exercise-progressions') %}active{% endif %}">Progressions</a>
+      <a href="/analytics" class="nav-link {% if request.path.startswith('/analytics') or request.path.startswith('/bodyweight') %}active{% endif %}">Analytics</a>
+      <a href="/templates" class="nav-link {% if request.path.startswith('/templates') %}active{% endif %}">Templates</a>
+      <a href="/search" class="nav-link {% if request.path.startswith('/search') %}active{% endif %}">Smart Search</a>
+      <a href="/import-hevy" class="nav-link {% if request.path.startswith('/import-hevy') %}active{% endif %}">Hevy Import</a>
+    </div>
+    <div class="nav-section"><span>Future</span>
+      <a href="/coaching" class="nav-link {% if request.path == '/coaching' %}active{% endif %}">Coaching</a>
+      <a href="/roadmap" class="nav-link {% if request.path.startswith('/roadmap') %}active{% endif %}">Roadmap</a>
+    </div>
+  </nav>
+  <div class="side-card"><small>Demo product</small><b>Performance Engine</b><p>Training execution, progression, athlete intelligence, analytics and gamified consistency in one local SQLite module.</p></div>
+</aside>
+<main class="main content-enter">
+  <header class="topbar"><div><p class="eyebrow">Performance tracking module</p><h1>{% block title %}{% endblock %}</h1></div>
+    <div class="command-search" id="commandSearch"><button type="button" id="openPalette" class="command-btn" title="Open command palette"><span>⌕</span><em>Search ATHENA...</em><kbd>Ctrl K</kbd></button></div>
+    <a class="primary nav-link" href="/execute">Start execution</a></header>
+  {% with messages=get_flashed_messages() %}{% if messages %}<div class="flash">{{ messages[0] }}</div>{% endif %}{% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<div id="palette" class="command-palette" aria-hidden="true">
+  <div class="palette-panel">
+    <div class="palette-input"><span>⌕</span><input id="paletteInput" placeholder="Search workouts, exercises, routines, goals..."><button id="closePalette" type="button">×</button></div>
+    <div id="paletteResults" class="palette-results"><p class="muted">Start typing to search the entire ATHENA module.</p></div>
+  </div>
+</div>
+<script>
+const loader=document.getElementById('pageLoader');
+window.addEventListener('load',()=>setTimeout(()=>loader.classList.add('hide'),220));
+document.querySelectorAll('a.nav-link').forEach(a=>a.addEventListener('click',e=>{if(a.target||a.href.includes('#'))return; loader.classList.remove('hide');}));
+document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',()=>loader.classList.remove('hide')));
+// Preserve left sidebar navigation scroll between page loads so navigation does not jump to the top.
+(function(){
+  const nav=document.querySelector('.side-nav');
+  const sidebar=document.querySelector('.sidebar');
+  const targets=[nav, sidebar].filter(Boolean);
+  if(!targets.length) return;
+  const key='athena_side_nav_scroll_v5';
+  function current(){
+    const active = targets.find(el => (el.scrollTop||0) > 0) || nav || sidebar;
+    return active ? (active.scrollTop||0) : 0;
+  }
+  function save(){try{sessionStorage.setItem(key,String(current()));}catch(e){}}
+  function restore(){
+    try{
+      const saved=parseInt(sessionStorage.getItem(key)||'0',10)||0;
+      targets.forEach(el=>{ el.scrollTop=saved; });
+    }catch(e){}
+  }
+  function restoreLater(){requestAnimationFrame(()=>{restore(); setTimeout(restore,80); setTimeout(restore,220);});}
+  restoreLater();
+  window.addEventListener('pageshow',restoreLater);
+  targets.forEach(el=>el.addEventListener('scroll',save,{passive:true}));
+  document.querySelectorAll('a.nav-link').forEach(a=>{
+    a.addEventListener('pointerdown',save);
+    a.addEventListener('mousedown',save);
+    a.addEventListener('click',save);
+  });
+  window.addEventListener('beforeunload',save);
+})();
+const palette=document.getElementById('palette'), input=document.getElementById('paletteInput'), results=document.getElementById('paletteResults');
+function openPalette(){palette.classList.add('show'); palette.setAttribute('aria-hidden','false'); setTimeout(()=>input.focus(),20)}
+function closePalette(){palette.classList.remove('show'); palette.setAttribute('aria-hidden','true')}
+document.getElementById('openPalette').addEventListener('click',openPalette);
+document.getElementById('closePalette').addEventListener('click',closePalette);
+document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPalette()} if(e.key==='Escape') closePalette(); });
+palette.addEventListener('click',e=>{ if(e.target===palette) closePalette(); });
+let timer=null;
+input.addEventListener('input',()=>{ clearTimeout(timer); const q=input.value.trim(); if(!q){results.innerHTML='<p class="muted">Start typing to search the entire ATHENA module.</p>'; return;} timer=setTimeout(async()=>{ const res=await fetch('/api/search?q='+encodeURIComponent(q)); const data=await res.json(); results.innerHTML=data.length?data.map(x=>`<a class="palette-row" href="${x.url}"><span>${x.type}</span><b>${x.title}</b><small>${x.meta}</small></a>`).join(''):'<p class="muted">No matches. Press Enter to open full search.</p>'; },140); });
+input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const first=results.querySelector('a'); if(first){window.location=first.href}else{window.location='/search?q='+encodeURIComponent(input.value)}} });
+</script>
+
+<script>
+(function(){
+  function qs(sel, root=document){return root.querySelector(sel)}
+  function qsa(sel, root=document){return Array.from(root.querySelectorAll(sel))}
+  function openPicker(id){const m=qs('#'+id+'_modal'); if(m){if(m.parentElement!==document.body){document.body.appendChild(m);} m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.classList.add('picker-lock'); const search=qs('[data-picker-search="'+id+'"]'); if(search){setTimeout(()=>search.focus(),60)}}}
+  function closePicker(id){const m=qs('#'+id+'_modal'); if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');document.body.classList.remove('picker-lock')}}
+  function filterPicker(id){
+    const search=(qs('[data-picker-search="'+id+'"]')?.value||'').trim().toLowerCase();
+    const muscle=qs('[data-picker-filter="'+id+'"]')?.value||'';
+    const type=qs('[data-picker-type="'+id+'"]')?.value||'';
+    const active=qs('[data-picker-tabs="'+id+'"] button.active')?.dataset.pickerTab||'all';
+    let visible=0;
+    qsa('[data-pick-exercise="'+id+'"]').forEach(card=>{
+      const okSearch=!search || (card.dataset.search||'').includes(search);
+      const okMuscle=!muscle || card.dataset.muscle===muscle;
+      const okType=!type || card.dataset.type===type;
+      const okTab=active==='all' || (active==='favorites' && card.dataset.favorite==='1') || (active==='recent' && card.dataset.recent==='1');
+      const show=okSearch && okMuscle && okType && okTab;
+      card.hidden=!show; if(show) visible++;
+    });
+    const empty=qs('[data-picker-empty="'+id+'"]'); if(empty) empty.hidden=visible!==0;
+  }
+  document.addEventListener('click', function(e){
+    const open=e.target.closest('[data-open-picker]'); if(open){openPicker(open.dataset.openPicker); return;}
+    const close=e.target.closest('[data-close-picker]'); if(close){closePicker(close.dataset.closePicker); return;}
+    const tab=e.target.closest('[data-picker-tab]'); if(tab){const wrap=tab.closest('[data-picker-tabs]'); qsa('button',wrap).forEach(b=>b.classList.remove('active')); tab.classList.add('active'); filterPicker(wrap.dataset.pickerTabs); return;}
+    const pick=e.target.closest('[data-pick-exercise]'); if(pick){
+      const id=pick.dataset.pickExercise;
+      const input=qs('#'+id+'_input'); if(input) input.value=pick.dataset.id;
+      const name=qs('#'+id+'_selected_name'); if(name) name.textContent=pick.dataset.name;
+      const meta=qs('#'+id+'_selected_meta'); if(meta) meta.textContent=pick.dataset.meta;
+      closePicker(id);
+    }
+  });
+  document.addEventListener('input', e=>{const id=e.target.dataset.pickerSearch; if(id) filterPicker(id)});
+  document.addEventListener('change', e=>{const id=e.target.dataset.pickerFilter || e.target.dataset.pickerType; if(id) filterPicker(id)});
+  document.addEventListener('keydown', e=>{if(e.key==='Escape') qsa('.exercise-picker-modal.open').forEach(m=>closePicker(m.id.replace('_modal','')))});
+})();
+</script>
+
+<script>
+(function(){
+  function closeGenericModal(modal){
+    if(!modal) return;
+    modal.classList.remove('show','open');
+    modal.setAttribute('aria-hidden','true');
+    if(!document.querySelector('.modal.show, .exercise-picker-modal.open')){
+      document.body.classList.remove('picker-lock','modal-lock');
+    }
+  }
+  function closeAllGenericModals(){
+    document.querySelectorAll('.modal.show').forEach(closeGenericModal);
+  }
+
+  // Make older inline modal helpers backdrop-aware without breaking existing pages.
+  const previousOpenModal = window.openModal;
+  window.openModal = function(id){
+    const modal=document.getElementById(id);
+    if(!modal) return;
+    if(modal.parentElement!==document.body){document.body.appendChild(modal);}
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-lock');
+    if(typeof previousOpenModal === 'function' && previousOpenModal !== window.openModal){
+      // Do not call old helper because it may duplicate class changes after re-parenting.
+    }
+  };
+  window.closeModal = function(id){closeGenericModal(document.getElementById(id));};
+
+  const previousOpenGoalModal = window.openGoalModal;
+  window.openGoalModal = function(id){window.openModal(id);};
+  window.closeGoalModal = function(id){window.closeModal(id);};
+
+  document.addEventListener('click', function(e){
+    const modal=e.target.closest('.modal.show');
+    if(modal && e.target === modal){
+      closeGenericModal(modal);
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeAllGenericModals();
+  });
+})();
+</script>
+
+<script>
+(function(){
+  const root=document.querySelector('[data-skill-page]');
+  if(!root) return;
+  const key='athena_skill_view_mode_v1';
+  const list=document.querySelector('[data-skill-list]');
+  const buttons=Array.from(document.querySelectorAll('[data-skill-view]'));
+  function setView(mode){
+    const finalMode = mode === 'cards' ? 'cards' : 'compact';
+    if(list){list.dataset.view=finalMode;}
+    root.dataset.view=finalMode;
+    buttons.forEach(b=>b.classList.toggle('active', b.dataset.skillView===finalMode));
+    try{localStorage.setItem(key, finalMode);}catch(e){}
+  }
+  buttons.forEach(btn=>btn.addEventListener('click',()=>setView(btn.dataset.skillView)));
+  let saved='compact';
+  try{saved=localStorage.getItem(key)||'compact';}catch(e){}
+  setView(saved);
+})();
+</script>
+
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+  <a href="/" class="{% if request.path == '/' %}active{% endif %}"><span>⌂</span><small>Home</small></a>
+  <a href="/execute" class="{% if request.path.startswith('/execute') %}active{% endif %}"><span>▶</span><small>Start</small></a>
+  <a href="/skills" class="{% if request.path.startswith('/skills') %}active{% endif %}"><span>▲</span><small>Skills</small></a>
+  <a href="/analytics" class="{% if request.path.startswith('/analytics') %}active{% endif %}"><span>◔</span><small>Data</small></a>
+  <a href="/exercises" class="{% if request.path.startswith('/exercises') %}active{% endif %}"><span>✚</span><small>Library</small></a>
+</nav>
+
+</body>
+</html>

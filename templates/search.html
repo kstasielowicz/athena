@@ -1,0 +1,16 @@
+{% extends 'base.html' %}{% block title %}Smart Search{% endblock %}{% block content %}
+<section class="card search-shell">
+  <div class="search-head">
+    <div><p class="eyebrow">Global search</p><h2>Search across ATHENA</h2><p class="muted">Workouts, exercises, routines and notes in one clean view.</p></div>
+  </div>
+  <form class="search-bar-modern" method="get">
+    <input name="q" value="{{term}}" placeholder="Search workouts, exercise names, dates, tags or notes...">
+    <button class="primary">Search</button>
+  </form>
+</section>
+<div class="search-results-grid">
+  <section class="card result-panel"><div class="result-title"><h3>Workouts</h3><span>{{workouts|length}}</span></div>{% for w in workouts %}<a class="result-row" href="/workouts/{{w.id}}"><b>{{w.name}}</b><small>{{w.date}} - {{w.source}}</small><p>{{w.notes[:120] if w.notes else 'No notes saved.'}}</p></a>{% else %}<p class="muted">No workout results.</p>{% endfor %}</section>
+  <section class="card result-panel"><div class="result-title"><h3>Exercises</h3><span>{{exercises|length}}</span></div>{% for e in exercises %}<a class="result-row" href="/progress/{{e.id}}"><b>{{e.name}}</b><small>{{e.muscle_group}} - {{e.exercise_type}}</small><p>{{e.metric_hint}}</p></a>{% else %}<p class="muted">No exercise results.</p>{% endfor %}</section>
+  <section class="card result-panel"><div class="result-title"><h3>Routines</h3><span>{{routines|length}}</span></div>{% for r in routines %}<a class="result-row" href="/routines/{{r.id}}"><b>{{r.name}}</b><small>{{r.goal}} - {{r.intensity}}</small><p>Open routine builder and start workout from template.</p></a>{% else %}<p class="muted">No routine results.</p>{% endfor %}</section>
+</div>
+{% endblock %}

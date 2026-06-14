@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420">
+  <defs><radialGradient id="g" cx="25%" cy="20%" r="80%"><stop offset="0" stop-color="#2aff88" stop-opacity=".38"/><stop offset=".55" stop-color="#0d2b1a"/><stop offset="1" stop-color="#020805"/></radialGradient><linearGradient id="line" x1="0" x2="1"><stop stop-color="#2aff88"/><stop offset="1" stop-color="#b7ff4a"/></linearGradient></defs>
+  <rect width="720" height="420" rx="42" fill="url(#g)"/>
+  <circle cx="585" cy="78" r="72" fill="#2aff88" opacity=".18"/><circle cx="110" cy="325" r="118" fill="#b7ff4a" opacity=".08"/><circle cx="600" cy="318" r="130" fill="#2aff88" opacity=".06"/>
+  <path d="M72 290 C170 210, 240 280, 350 194 S520 152, 648 214" fill="none" stroke="url(#line)" stroke-width="8" stroke-linecap="round" opacity=".75"/>
+  <rect x="50" y="48" width="620" height="324" rx="34" fill="none" stroke="#2aff88" stroke-opacity=".22"/>
+  <text x="70" y="118" font-family="Inter,Arial,sans-serif" font-size="22" fill="#9fffc4" font-weight="700">ATHENA EXERCISE LAB</text>
+  <text x="70" y="222" font-family="Inter,Arial,sans-serif" font-size="52" fill="#f2fff5" font-weight="900" letter-spacing="1">FARMER WALK</text>
+  <text x="70" y="268" font-family="Inter,Arial,sans-serif" font-size="20" fill="#a9b9ae">performance tracking placeholder</text>
+</svg>
