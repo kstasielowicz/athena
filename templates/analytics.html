@@ -1,22 +1,203 @@
-{% extends 'base.html' %}{% block title %}Analytics Center{% endblock %}{% block content %}
+{% extends 'base.html' %}
+{% block title %}Analytics Center{% endblock %}
+{% block content %}
+
 <div class="analytics-stack">
-  <section class="card"><p class="eyebrow">ATHENA heatmap</p><h2>Training consistency</h2><div class="heatmap analytics-heat compact-heatmap">{% for d in heat %}<span class="heat l{{d.level}}" data-tooltip="{{d.date}} - {{d.count}} workout{% if d.count != 1 %}s{% endif %}" title="{{d.date}} - {{d.count}} workouts"></span>{% endfor %}</div><p class="muted">Compact heatmap - hover a cell for exact training count.</p></section>
+  
+  <section class="card">
+    <p class="eyebrow">ATHENA Heatmap</p>
+    <h2>Training Consistency Matrix</h2>
+    <div class="heatmap analytics-heat compact-heatmap">
+      {% for d in heat %}
+        <span class="heat l{{d.level}}" data-tooltip="{{d.date}} — {{d.count}} workout{% if d.count != 1 %}s{% endif %}"></span>
+      {% endfor %}
+    </div>
+    <p class="muted">Microcycle tracking layer — hover over a data node for exact training session counts.</p>
+  </section>
 
   <div class="grid cols-2 analytics-grid">
-    <section class="card" id="bodyweight"><div class="section-head"><div><p class="eyebrow">Bodyweight center</p><h2>Weight trend</h2></div><span class="pill green">{{bodyweight_center.current or '-'}} kg</span></div><div class="metric-row"><span><b>{{bodyweight_center.first or '-'}}</b><small>First</small></span><span><b>{{bodyweight_center.current or '-'}}</b><small>Current</small></span><span><b>{{bodyweight_center.trend}}</b><small>Trend kg</small></span></div><div class="mini-chart tooltip-chart">{% for b in bodyweight %}<div style="height:{{ ((b.bodyweight or 0)-70)*6 + 30 }}px" data-tooltip="{{b.date}} - {{b.bodyweight}} kg" title="{{b.date}} - {{b.bodyweight}} kg"><span>{{b.bodyweight}}</span></div>{% endfor %}</div><p class="muted">Bodyweight has been merged into Analytics, so training load, consistency and weight changes live in one place.</p></section>
-    <section class="card"><p class="eyebrow">Muscle groups</p><h2>Training distribution</h2>{% for w in balance_warnings %}<div class="balance-warning {{w.level}}"><b>{{w.title}}</b><span>{{w.text}}</span></div>{% endfor %}{% for m in muscles %}<div class="bar-row" data-tooltip="{{m.muscle}} - {{m.volume}} training score" title="{{m.muscle}} - {{m.volume}}"><span>{{m.muscle}}</span><div><b style="width:{{m.pct}}%"></b></div><em>{{m.volume}}</em></div>{% endfor %}</section>
+    
+    <section class="card" id="bodyweight">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Biometric Center</p>
+          <h2>Weight Trend Profile</h2>
+        </div>
+        <span class="pill green">{{bodyweight_center.current or '-'}} kg</span>
+      </div>
+      <div class="metric-row">
+        <span><b>{{bodyweight_center.first or '-'}}</b><small>Baseline</small></span>
+        <span><b>{{bodyweight_center.current or '-'}}</b><small>Current</small></span>
+        <span><b>{{bodyweight_center.trend}}</b><small>Delta (kg)</small></span>
+      </div>
+      
+      <div class="mini-chart tooltip-chart">
+        {% for b in bodyweight %}
+          <div style="height: calc(30px + ({{ b.bodyweight or 0.0 }} - 50) * 4px);" data-tooltip="{{b.date}} — {{b.bodyweight}} kg">
+            <span>{{b.bodyweight}}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <p class="muted">Biometric markers live aligned with training load metrics to guarantee adaptation accuracy.</p>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Anatomical Matrix</p>
+      <h2>Training Volume Distribution</h2>
+      
+      {% for w in balance_warnings %}
+        <div class="balance-warning {{w.level}}">
+          <b>{{w.title}}</b>
+          <span>{{w.text}}</span>
+        </div>
+      {% endfor %}
+      
+      {% for m in muscles %}
+        <div class="bar-row" data-tooltip="{{m.muscle}} — {{m.volume}} training score">
+          <span>{{m.muscle}}</span>
+          <div>
+            <b style="width:{{m.pct}}%"></b>
+          </div>
+          <em>{{m.volume|round(0)}}</em>
+        </div>
+      {% endfor %}
+    </section>
   </div>
 
-  <section class="card"><p class="eyebrow">Session score formula</p><h2>Recent session scores</h2><p class="muted">Formula: readiness 35% + focus 25% + low fatigue 20% + mood 15% + duration discipline 5%.</p><table><tr><th>Date</th><th>Workout</th><th>Score</th><th>Mood</th><th>Readiness</th><th>Fatigue</th></tr>{% for w in workouts %}<tr><td>{{w.date}}</td><td>{{w.name}}</td><td><span class="pill green">{{w.session_score}}/100</span></td><td>{{w.mood}}</td><td>{{w.readiness}}</td><td>{{w.fatigue}}</td></tr>{% endfor %}</table></section>
+  <section class="card">
+    <p class="eyebrow">Performance Architecture</p>
+    <h2>Recent Session Score Metrics</h2>
+    <p class="muted">ATHENA Score Algorithm: Readiness 35% · Focus 25% · Fatigue Management 20% · Mood State 15% · Duration Adherence 5%.</p>
+    
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Execution Date</th>
+            <th>Workout Protocol</th>
+            <th>ATHENA Score</th>
+            <th>Mood State</th>
+            <th>Readiness Index</th>
+            <th>Fatigue Index</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for w in workouts %}
+            <tr>
+              <td>{{w.date}}</td>
+              <td><b>{{w.name}}</b></td>
+              <td><span class="pill green">{{w.session_score}}/100</span></td>
+              <td>{{w.mood}}</td>
+              <td>{{w.readiness}} / 10</td>
+              <td>{{w.fatigue}} / 10</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
 
   <div class="grid cols-2 analytics-grid">
-    <section class="card"><p class="eyebrow">Analytics 2.0</p><h2>Strength trends</h2>{% for t in strength_trends %}<div class="trend-row"><b>{{t.name}}</b><span class="pill {{'green' if t.direction=='up' else 'soft'}}">{{t.delta}}</span><small>{{t.first}} → {{t.last}}</small></div>{% else %}<p class="muted">Log at least two sessions for an exercise to see trend direction.</p>{% endfor %}</section>
-    <section class="card"><p class="eyebrow">Volume trends</p><h2>Monthly training load</h2>{% for v in volume_trends %}<div class="bar-row"><span>{{v.period}}</span><div><b style="width:{{ [100, (v.volume/100)|round(0)]|min }}%"></b></div><em>{{v.volume|round(0)}} kg</em></div>{% else %}<p class="muted">No volume data yet.</p>{% endfor %}</section>
+    
+    <section class="card">
+      <p class="eyebrow">Analytics 2.0 Engine</p>
+      <h2>Estimated 1RM Strength Trends</h2>
+      {% for t in strength_trends %}
+        <div class="trend-row">
+          <b>{{t.name}}</b>
+          <span class="pill {% if t.direction=='up' %}green{% else %}soft{% endif %}">
+            {{'+' if t.delta > 0 else ''}}{{t.delta}}
+          </span>
+          <small>{{t.first}} kg → {{t.last}} kg</small>
+        </div>
+      {% else %}
+        <p class="muted">Log at least two working sets inside an exercise vector to deploy strength trends.</p>
+      {% endfor %}
+    </section>
+    
+    <section class="card">
+      <p class="eyebrow">Volume Allocation</p>
+      <h2>Monthly Training Load Profiles</h2>
+      {% for v in volume_trends %}
+        <div class="bar-row">
+          <span>{{v.period}}</span>
+          <div>
+            <b style="width:{{ [100, (v.volume / 150)|round(0)]|min }}%"></b>
+          </div>
+          <em>{{v.volume|round(0)}} kg</em>
+        </div>
+      {% else %}
+        <p class="muted">No volume records calculated inside this block yet.</p>
+      {% endfor %}
+    </section>
   </div>
+
   <div class="grid cols-3 analytics-grid">
-    <section class="card"><p class="eyebrow">PR Center</p><h2>Best outputs</h2>{% for r in pr_center %}<a class="record-mini nav-link" href="/workouts/{{r.workout_id}}"><small>{{r.type}}</small><b>{{r.name}}</b><span>{{r.display}}</span></a>{% else %}<p class="muted">No PRs yet.</p>{% endfor %}</section>
-    <section class="card"><p class="eyebrow">Exercise frequency</p><h2>Most trained</h2>{% for e in exercise_frequency %}<div class="trend-row"><b>{{e.name}}</b><span>{{e.sessions}} sessions</span><small>{{e.muscle_group}}</small></div>{% else %}<p class="muted">No exercise frequency yet.</p>{% endfor %}</section>
-    <section class="card"><p class="eyebrow">Gamification</p><h2>Level {{gamification.level}}</h2><p class="muted">{{gamification.xp}} XP total. {{gamification.next}} XP to next level.</p><div class="xp-bar"><b style="width:{{(gamification.progress/250*100)|round(0)}}%"></b></div>{% for b in gamification.badges %}<div class="badge-row {{'unlocked' if b.unlocked else ''}}"><b>{{b.title}}</b><span>{{'Unlocked' if b.unlocked else 'Locked'}}</span></div>{% endfor %}</section>
+    
+    <section class="card">
+      <p class="eyebrow">PR Matrix Center</p>
+      <h2>Peak Force Outputs</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px; width: 100%;">
+        {% for r in pr_center %}
+          <a class="record-mini nav-link" href="/workouts/{{r.workout_id}}" style="display: flex; flex-direction: column; justify-content: center; gap: 4px; border: 1px solid var(--line); background: #07100b; padding: 12px 16px; border-radius: 16px; min-height: 82px; text-decoration: none; position: relative;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <small style="color: var(--accent); font-weight: 850; text-transform: uppercase; letter-spacing: .08em; font-size: 11px;">
+                {{r.type}}
+              </small>
+              <span class="pill green" style="font-size: 11px; padding: 3px 8px; font-family: monospace; font-weight: bold; white-space: nowrap;">
+                {{r.display}}
+              </span>
+            </div>
+            
+            <b style="font-size: 16px; color: var(--text); margin: 2px 0 0 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
+              {{r.name}}
+            </b>
+            
+          </a>
+        {% else %}
+          <p class="muted">No verified records found in log trail.</p>
+        {% endfor %}
+      </div>
+    </section>
+    
+    <section class="card">
+      <p class="eyebrow">Movement Exposure</p>
+      <h2>Most Frequently Trained</h2>
+      {% for e in exercise_frequency %}
+        <div class="trend-row">
+          <b>{{e.name}}</b>
+          <span>{{e.sessions}} logs</span>
+          <small>{{e.muscle_group}} Matrix</small>
+        </div>
+      {% else %}
+        <p class="muted">No exercise log frequency processed yet.</p>
+      {% endfor %}
+    </section>
+    
+    <section class="card">
+      <p class="eyebrow">RPG Core Progression</p>
+      <h2>Level {{gamification.level}}</h2>
+      <p class="muted">{{gamification.xp}} total XP · {{gamification.next}} XP required for next tier tier milestone.</p>
+      
+      <div class="xp-bar" title="Level progress: {{ gamification.pct }}%">
+        <b style="width:{{ gamification.pct }}%"></b>
+      </div>
+      
+      <div class="v10-list" style="margin-top: 15px;">
+        {% for b in gamification.badges %}
+          <div class="badge-row {% if b.unlocked %}unlocked{% endif %}" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--line); padding: 8px 0; opacity: {% if b.unlocked %}1{% else %}0.5{% endif %};">
+            <b style="font-size: 0.9em; color: var(--text); font-weight: normal;">{{b.title}}</b>
+            <span class="pill {% if b.unlocked %}green{% else %}soft{% endif %}" style="font-size: 10px; padding: 3px 8px;">
+              {{'Unlocked' if b.unlocked else 'Locked'}}
+            </span>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+    
   </div>
 </div>
+
 {% endblock %}

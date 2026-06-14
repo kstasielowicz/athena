@@ -1,42 +1,170 @@
-{% extends 'base.html' %}{% block title %}ATHENA Roadmap{% endblock %}{% block content %}
+{% extends 'base.html' %}
+{% block title %}ATHENA Roadmap{% endblock %}
+{% block content %}
+
 <section class="card hero roadmap-hero">
-  <p class="eyebrow">Stages 1–8</p>
-  <h2>ATHENA product roadmap</h2>
-  <p class="muted">A clearer standalone path: build the athlete platform first, keep coaching as a locked future upgrade, and avoid merging ATHENA into any larger product too early.</p>
-</section>
-
-{% set stages=[
-  ('1','Workout Execution','Built','Live workout mode with set completion, RPE, rest timer, notes and session summary.','Athlete core'),
-  ('2','Athlete Profile','Built','Identity, body metrics, strength metrics, ATHENA level and readiness context.','Athlete core'),
-  ('3','Program Builder','Built','Multi-week training blocks connected to routines and progression planning.','Programming'),
-  ('4','Coach Signal 2.0','Preview built','Readiness, fatigue, compliance and RIS-aware recommendations shown as guidance.','Intelligence'),
-  ('5','Coaching Module','Locked preview','A single future-facing screen for coach-led training and coach capability.','Future module'),
-  ('6','Coach Capability','Planned','Future option to train under someone or eventually operate as a coach. No dashboard yet.','Future module'),
-  ('7','Compliance System','Built','Planned vs completed sessions as a coaching-ready metric.','Analytics'),
-  ('8','Roadmap Page','Built','Visible product direction inside the app with clear stage status.','Product')
-] %}
-
-<div class="roadmap-board">
-  {% for n,t,s,d,g in stages %}
-  <article class="card roadmap-stage {% if 'Built' in s %}done{% elif 'Preview' in s %}preview{% else %}planned{% endif %}">
-    <div class="stage-number">{{n}}</div>
-    <div class="stage-body">
-      <div class="stage-top"><span class="pill soft">{{g}}</span><span class="stage-status">{{s}}</span></div>
-      <h3>{{t}}</h3>
-      <p class="muted">{{d}}</p>
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Strategic Product Lifecycle</p>
+      <h2>ATHENA Architectural Roadmap & Engineering Pipeline</h2>
+      <p class="muted">Explore the multi-phase deployment roadmap designed for advanced sports science execution. We prioritize heavy data tracking math, non-linear progression algorithms, and absolute UI stability, while carefully scheduling commercial marketplace features into ring-fenced future releases.</p>
     </div>
-  </article>
-  {% endfor %}
-</div>
-
-<section class="card roadmap-next">
-  <p class="eyebrow">Recommended next focus</p>
-  <h3>Make execution feel complete before adding more modules</h3>
-  <div class="capability-grid">
-    <span>Better live workout flow</span>
-    <span>Program calendar view</span>
-    <span>Post-session review</span>
-    <span>Progression suggestions</span>
+    <span class="pill status-pill green">V0.01</span>
   </div>
 </section>
+
+<div class="roadmap-board" style="display: flex; flex-direction: column; gap: 16px; margin-top: 24px; width: 100%;">
+  
+  <article class="card roadmap-stage done" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">01</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill green">Athlete Core</span>
+        <span class="stage-status">Engine Loaded</span>
+      </div>
+      <h3>Advanced Workout Execution Environment</h3>
+      <p class="muted">Deployment of the real-time asynchronous logging layer. Features continuous background processing for working set calculations, precise RPE/RIR tracking weight matrices, built-in rest threshold audio timers, and live single-rep maximal capability mapping.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft">✓ Brzycki e1RM Core</small>
+        <small class="pill soft">✓ Adaptive Rest Timers</small>
+        <small class="pill soft">✓ Asynchronous State Logs</small>
+      </div>
+    </div>
+  </article>
+
+  <article class="card roadmap-stage done" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">02</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill green">Athlete Core</span>
+        <span class="stage-status">Engine Loaded</span>
+      </div>
+      <h3>Athlete Identity Profile & Gamification Matrix</h3>
+      <p class="muted">Integration of the unified progression layer. Implements advanced non-linear mathematical level scaling curves, automated milestone badge triggers, personal record historic trail mining, and a modular Talent Points framework designed to fund future system perks.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft">✓ Non-Linear Level Scaling</small>
+        <small class="pill soft">✓ Badge Verification Nodes</small>
+        <small class="pill soft">✓ Talent Point Pools</small>
+      </div>
+    </div>
+  </article>
+
+  <article class="card roadmap-stage done" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">03</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill green">Programming</span>
+        <span class="stage-status">Built</span>
+      </div>
+      <h3>Macrocycle Program Builder & Routine Compiler</h3>
+      <p class="muted">Multi-week training block architecture toolset. Enables advanced trainees to map complex microcycles, pre-compile split training days, handle modular volume scaling variants, and deploy standalone macro routines straight into the active tracking dashboard.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft">✓ Multi-Week Block Design</small>
+        <small class="pill soft">✓ Microcycle Template Mapping</small>
+        <small class="pill soft">✓ Direct Dashboard Injections</small>
+      </div>
+    </div>
+  </article>
+
+  <article class="card roadmap-stage done" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">04</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill green">Intelligence</span>
+        <span class="stage-status">Intelligence Live</span>
+      </div>
+      <h3>Coach Signal 2.0: Acute-to-Chronic Workload Ratio</h3>
+      <p class="muted">Deployment of the autonomous health protection layer. Calculates automated training suggestions by parsing the mathematical relationship between 7-day acute exhaustion and 28-day chronic adaptation averages, preventing tissue failure before it initializes.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft">✓ ACWR Safety Bounds (0.8 - 1.3)</small>
+        <small class="pill soft">✓ Dynamic Fatigue Alerts</small>
+        <small class="pill soft">✓ Adaptive Volume Caps</small>
+      </div>
+    </div>
+  </article>
+
+  <article class="card roadmap-stage preview" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">05</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill soft">Future Module</span>
+        <span class="stage-status">Locked Preview</span>
+      </div>
+      <h3>Decentralized Marketplace & Coaching Infrastructure</h3>
+      <p class="muted" style="color: var(--text);">A secure, encrypted bidirectional telemetry layer allowing remote human mentors to supervise your profile logs. Introduces specialized pricing marketplaces, weekly digital check-in tools, video execution form responses, and dedicated nutritional dietitian portals.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft" style="color: var(--gold); border-color: rgba(244,196,48,0.3);">⏱ Marketplace Bidding Pipeline</small>
+        <small class="pill soft" style="color: var(--gold); border-color: rgba(244,196,48,0.3);">⏱ Dietitian Macro Matrices</small>
+        <small class="pill soft" style="color: var(--gold); border-color: rgba(244,196,48,0.3);">⏱ Shared ACWR Streams</small>
+      </div>
+    </div>
+  </article>
+
+  <article class="card roadmap-stage planned" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">06</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill soft">Future Module</span>
+        <span class="stage-status">Planned</span>
+      </div>
+      <h3>Enterprise Trainee Control & Roster Management</h3>
+      <p class="muted">Role-based sub-system layer allowing premium ATHENA operators to convert their existing identity accounts into Coach profiles. Unlocks centralized roster management, mass training block updates, and cross-client telemetry comparison boards without additional external applications.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft">⚙ Role-Based Architecture</small>
+        <small class="pill soft">⚙ Client Roster Analytics</small>
+        <small class="pill soft">⚙ Corporate Scale Options</small>
+      </div>
+    </div>
+  </article>
+
+  <article class="card roadmap-stage done" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">07</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill green">Analytics</span>
+        <span class="stage-status">Built</span>
+      </div>
+      <h3>High-Fidelity Training Compliance Index</h3>
+      <p class="muted">Core reliability metric evaluating structural program execution. Computes exactly completed vs. planned sessions across macrocycles, producing a clear readiness coefficient that indicates psychological grit and physical recovery adherence trends.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft">✓ Realized vs Planned Matrix</small>
+        <small class="pill soft">✓ Adherence Trend Profiling</small>
+        <small class="pill soft">✓ Consistency Scoring Layers</small>
+      </div>
+    </div>
+  </article>
+
+  <article class="card roadmap-stage done" style="margin-bottom: 0; width: 100%;">
+    <div class="stage-number" style="font-family: monospace;">08</div>
+    <div class="stage-body">
+      <div class="stage-top">
+        <span class="pill green">Product</span>
+        <span class="stage-status">Optimized</span>
+      </div>
+      <h3>System Roadmap Matrix Integration</h3>
+      <p class="muted">In-app architecture documentation layer. Transparently displays system development goals, technical functional parameters, delivery benchmarks, and release cycles, ensuring alignment between software engineering and athlete tracking demands.</p>
+      <div class="tag-row" style="margin-top: 10px;">
+        <small class="pill soft">✓ Public Build Verification</small>
+        <small class="pill soft">✓ Feature Status Signals</small>
+        <small class="pill soft">✓ Version 12 Alignment</small>
+      </div>
+    </div>
+  </article>
+
+</div>
+<br>
+
+<section class="card roadmap-next">
+  <p class="eyebrow">Active Iteration Target</p>
+  <h3>Next Deployment Focus: Mathematical Engine Reinforcement</h3>
+  <p class="muted">We are firmly committed to building software density. Instead of serving shallow, un-coded feature placeholders, our active sprint cycle is strictly refining execution flow math, audio hardware API hooks, and biometric correlation accuracy.</p>
+  
+  <div class="capability-grid" style="margin-top: 16px;">
+    <span>📈 e1RM Logarithmic Charts</span>
+    <span>🛡️ Real-Time ACWR Buffer Alerts</span>
+    <span>🌲 Talent Point Progression Perks</span>
+    <span>🔊 Rest Timer Background Audio API</span>
+  </div>
+</section>
+
 {% endblock %}

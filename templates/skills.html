@@ -1,25 +1,265 @@
-{% extends 'base.html' %}{% block title %}Skill Trees 2.0{% endblock %}{% block content %}
+{% extends 'base.html' %}
+{% block title %}Skill Trees 2.0{% endblock %}
+{% block content %}
 {% set tree_skills = skill_tree_view_data() %}
-<section class="card hero skill-hero clean-hero"><div class="section-head"><div><p class="eyebrow">ATHENA Skill System 2.0</p><h2>Visual skill trees, locked nodes and skill XP</h2><p class="muted">Use compact mode for many skills or cards mode for a full progression tree.</p></div><div class="hero-actions"><a class="btn" href="/skill-evidence">Evidence gallery</a></div></div></section><br>
-<section class="grid cols-5 attribute-strip">{% for a in attributes %}<div class="card stat attribute-card"><div class="attribute-top"><small>{{a.name}}</small><b>{{a.score}}</b></div><div class="mini-progress"><span style="width:{{a.score}}%"></span></div></div>{% endfor %}</section><br>
-<div class="skill-toolbar card"><div><p class="eyebrow">View mode</p><h3>Skill system</h3></div><div class="segmented-control"><button type="button" data-skill-view="compact">Compact</button><button type="button" data-skill-view="cards">Cards</button></div></div><br>
+
+<section class="card hero skill-hero clean-hero">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">ATHENA Skill System</p>
+      <h2>Visual Skill Trees & Progressions</h2>
+      <p class="muted">Track your calisthenics milestones, unlock progression nodes, and secure training adaptations through uploaded evidence profiles.</p>
+    </div>
+    <div class="hero-actions">
+      <a class="btn nav-link" href="/skill-evidence">Evidence gallery</a>
+    </div>
+  </div>
+</section>
+<br>
+
+<section class="grid cols-5 attribute-strip">
+  {% for a in attributes %}
+    <div class="card stat attribute-card">
+      <div class="attribute-top">
+        <small>{{a.name}}</small>
+        <b>{{a.score}}</b>
+      </div>
+      <div class="mini-progress">
+        <span style="width:{{a.score}}%"></span>
+      </div>
+    </div>
+  {% endfor %}
+</section>
+<br>
+
 <div class="skill-layout clean-skill-layout skill20-layout">
-  <form class="card skill-create-card" method="post"><p class="eyebrow">Create</p><h3>Add skill</h3><input type="hidden" name="mode" value="create"><label>Name</label><input name="name" required placeholder="Human Flag"><label>Category</label><input name="category" value="Street Workout"><div class="form-grid two"><div><label>Current level</label><input name="current_level" type="number" value="1"></div><div><label>Target level</label><input name="target_level" type="number" value="5"></div></div><label>Progress %</label><input name="progress" type="number" value="0" min="0" max="100"><label>Notes</label><textarea name="notes" placeholder="Current limitation, cue, goal or next progression..."></textarea><button class="primary">Add skill</button></form>
-  <section class="skill-list clean-skill-list skill20-list" data-skill-list data-view="compact">
+  
+  <form class="card skill-create-card" method="post">
+    <p class="eyebrow">Development Matrix</p>
+    <h3>Add Skill Tree</h3>
+    <input type="hidden" name="mode" value="create">
+    
+    <label>Skill Name</label>
+    <input name="name" required placeholder="e.g., Human Flag">
+    
+    <label>Category</label>
+    <input name="category" value="Street Workout">
+    
+    <div class="form-grid two">
+      <div>
+        <label>Current Lvl</label>
+        <input name="current_level" type="number" value="1">
+      </div>
+      <div>
+        <label>Target Lvl</label>
+        <input name="target_level" type="number" value="5">
+      </div>
+    </div>
+    
+    <label>Global Progress %</label>
+    <input name="progress" type="number" value="0" min="0" max="100">
+    
+    <label>Notes & Requirements</label>
+    <textarea name="notes" placeholder="Current limitations, cues, or baseline pre-requisites..."></textarea>
+    
+    <button class="primary" style="margin-top: 16px;">Initialize Tree</button>
+  </form>
+
+  <section class="skill-list clean-skill-list skill20-list" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
     {% for s in tree_skills %}
-    <article class="card skill-tree-card skill20-card">
-      <div class="skill20-head"><div><span class="pill green">{{s.category}}</span><h3>{{s.name}}</h3><p class="muted">{{s.notes or 'No notes yet.'}}</p></div><div class="skill20-score"><b>{{s.progress}}%</b><small>Skill XP {{s.skill_xp}} · Lvl {{s.skill_level}}</small></div></div>
-      <div class="mini-progress skill-main-progress"><span style="width:{{s.progress}}%"></span></div>
-      <div class="skill20-node-strip">{% for st in s.steps %}<span class="tree-dot20 {{'done' if st.completed else ('locked' if st.locked else 'open')}}" title="{{st.title}}">{{loop.index}}</span>{% endfor %}</div>
-      <details class="skill-details-panel skill20-details"><summary><span>Open tree</span><em>{{s.completed_steps}} / {{s.total_steps}} nodes</em></summary>
-        <div class="skill-tree skill-tree20">
-          {% for st in s.steps %}<div class="skill-node20 {{'done' if st.completed else ('locked' if st.locked else 'open')}}"><div class="node-dot">{{st.step_order}}</div><div class="node-card"><div class="section-head"><div><b>{{st.title}}</b><small>{{st.description or st.requirement}}</small></div><em>{{'Done' if st.completed else ('Locked' if st.locked else 'Open')}}</em></div>{% if st.evidence_image_path %}<img class="evidence-thumb" src="{{url_for('static', filename=st.evidence_image_path)}}" alt="Evidence">{% endif %}{% if st.evidence_note %}<p class="evidence-note">{{st.evidence_note}}</p>{% endif %}<div class="step-actions"><form method="post" action="/skills/{{s.id}}/steps/{{st.id}}/toggle"><button class="btn tiny">{% if st.completed %}Mark open{% else %}Mark done{% endif %}</button></form><button class="btn tiny" type="button" onclick="openModal('editStep{{st.id}}')">Edit</button></div><form class="evidence-form" method="post" action="/skills/{{s.id}}/steps/{{st.id}}/evidence" enctype="multipart/form-data"><label class="evidence-upload"><input type="file" name="evidence" accept="image/*"><span>Upload evidence</span></label><input name="evidence_note" placeholder="Short note"><button class="btn tiny">Save evidence</button></form></div></div><div id="editStep{{st.id}}" class="modal"><div class="modal-panel"><button class="x" onclick="closeModal('editStep{{st.id}}')">×</button><h2>Edit progression step</h2><form method="post" action="/skills/{{s.id}}/steps/{{st.id}}/edit" class="form-compact"><label>Order</label><input name="step_order" type="number" value="{{st.step_order}}"><label>Title</label><input name="title" value="{{st.title}}" required><label>Description</label><textarea name="description">{{st.description}}</textarea><label class="checkline"><input type="checkbox" name="completed" {% if st.completed %}checked{% endif %}> Completed</label><button class="primary">Save step</button></form><form method="post" action="/skills/{{s.id}}/steps/{{st.id}}/delete" onsubmit="return confirm('Delete this skill step?')"><button class="btn danger-btn">Delete step</button></form></div></div>{% else %}<p class="muted">No progression steps yet.</p>{% endfor %}
+      <article class="card skill-system-card skill20-card" style="margin-bottom: 0; width: 100%;">
+        
+        <div class="skill20-head">
+          <div>
+            <span class="pill green">{{s.category}}</span>
+            <h3 style="margin-top: 8px;">{{s.name}}</h3>
+            <p class="muted">{{s.notes or 'No strategic notes initialized yet.'}}</p>
+          </div>
+          <div class="skill20-score">
+            <b>{{s.progress}}%</b>
+            <small class="muted">Skill XP {{s.skill_xp}} · Lvl {{s.skill_level}}</small>
+          </div>
         </div>
-      </details>
-      <div class="skill-step-toolbar"><button class="btn tiny" type="button" onclick="openModal('addStep{{s.id}}')">+ Add node</button><button class="btn tiny" type="button" onclick="openModal('editSkill{{s.id}}')">Edit skill</button></div>
-      <div id="editSkill{{s.id}}" class="modal"><div class="modal-panel skill-modal-panel"><button class="x" onclick="closeModal('editSkill{{s.id}}')">×</button><p class="eyebrow">Edit skill</p><h2>{{s.name}}</h2><form method="post" class="form-compact skill-edit-modal-form"><input type="hidden" name="skill_id" value="{{s.id}}"><div class="form-grid two"><div><label>Current level</label><input name="current_level" type="number" value="{{s.current_level}}"></div><div><label>Target level</label><input name="target_level" type="number" value="{{s.target_level}}"></div></div><label>Progress %</label><input name="progress" type="number" value="{{s.progress}}" min="0" max="100"><label>Notes</label><textarea name="notes">{{s.notes}}</textarea><button class="primary">Save skill</button></form></div></div>
-      <div id="addStep{{s.id}}" class="modal"><div class="modal-panel"><button class="x" onclick="closeModal('addStep{{s.id}}')">×</button><h2>Add tree node</h2><form method="post" action="/skills/{{s.id}}/steps/add" class="form-compact"><label>Order</label><input name="step_order" type="number" value="{{s.steps|length + 1}}"><label>Title</label><input name="title" required><label>Description / requirement</label><textarea name="description"></textarea><label class="checkline"><input type="checkbox" name="completed"> Mark as completed</label><button class="primary">Add node</button></form></div></div>
-    </article>{% else %}<div class="card empty">No skills yet.</div>{% endfor %}
+        
+        <div class="mini-progress skill-main-progress" title="Global skill mastery: {{s.progress}}%">
+          <span style="width:{{s.progress}}%"></span>
+        </div>
+        
+        <div class="skill20-node-strip table-scroll" style="margin-top: 14px;">
+          {% for st in s.steps %}
+            <span class="tree-dot20 {% if st.completed %}done{% elif st.locked %}locked{% else %}open{% endif %}" title="{{st.title}}">{{loop.index}}</span>
+          {% endfor %}
+        </div>
+        
+        <details class="skill-details-panel skill20-details" style="margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,0.01);">
+          <summary style="cursor: pointer; padding: 14px; font-weight: bold; color: var(--text); display: flex; justify-content: space-between; align-items: center; user-select: none;">
+            <span>Expand Progression Blueprint</span>
+            <small class="muted">{{s.completed_steps}} / {{s.total_steps}} nodes clear</small>
+          </summary>
+          
+          <div class="skill-tree" style="padding: 14px; border-top: 1px solid var(--line);">
+            {% for st in s.steps %}
+              <div class="skill-node {% if st.completed %}done{% elif st.locked %}locked{% else %}open{% endif %}">
+                
+                <div class="node-dot">{{st.step_order}}</div>
+                
+                <div class="node-card card">
+                  <div class="section-head">
+                    <div>
+                      <b>{{st.title}}</b>
+                      <small class="muted">{{st.description or st.requirement}}</small>
+                    </div>
+                    <span class="pill {% if st.completed %}green{% else %}soft{% endif %}">
+                      {% if st.completed %}Done{% elif st.locked %}Locked{% else %}Open{% endif %}
+                    </span>
+                  </div>
+                  
+                  {% if st.evidence_image_path %}
+                    <img class="evidence-thumb" src="{{url_for('static', filename=st.evidence_image_path)}}" alt="Evidence Layer">
+                  {% endif %}
+                  {% if st.evidence_note %}
+                    <p class="metric-note">{{st.evidence_note}}</p>
+                  {% endif %}
+                  
+                  <div class="action-row" style="margin-top: 14px;">
+                    <form method="post" action="/skills/{{s.id}}/steps/{{st.id}}/toggle" style="display:inline;">
+                      <button class="btn tiny">{% if st.completed %}Mark open{% else %}Mark done{% endif %}</button>
+                    </form>
+                    <button class="btn tiny" type="button" onclick="openModal('editStep{{st.id}}')">Edit Node</button>
+                  </div>
+                  
+                  <form class="evidence-form form-compact" method="post" action="/skills/{{s.id}}/steps/{{st.id}}/evidence" enctype="multipart/form-data" style="margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px;">
+                    <div class="form-grid three align-end-mobile">
+                      <div>
+                        <label class="check" style="margin: 0; cursor: pointer;">
+                          <input type="file" name="evidence" accept="image/*" style="display:none;" onchange="this.nextElementSibling.textContent = 'File selected'">
+                          <span class="btn tiny" style="width: 100%; text-align: center;">Choose file</span>
+                        </label>
+                      </div>
+                      <div>
+                        <input name="evidence_note" placeholder="Verification notes..." style="height: 34px; padding: 6px 10px; font-size: 13px;">
+                      </div>
+                      <div>
+                        <button class="primary tiny" style="width: 100%; height: 34px;">Upload layer</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              
+              <div id="editStep{{st.id}}" class="modal">
+                <div class="modal-panel">
+                  <button type="button" class="x" onclick="closeModal('editStep{{st.id}}')">×</button>
+                  <h2>Edit Progression Node</h2>
+                  <form method="post" action="/skills/{{s.id}}/steps/{{st.id}}/edit" class="form-compact">
+                    <label>Node Execution Order</label>
+                    <input name="step_order" type="number" value="{{st.step_order}}">
+                    <label>Node Milestone Title</label>
+                    <input name="title" value="{{st.title}}" required>
+                    <label>Technical Description / Criteria</label>
+                    <textarea name="description">{{st.description}}</textarea>
+                    <label class="check"><input type="checkbox" name="completed" {% if st.completed %}checked{% endif %}> Node verified as completed</label>
+                    <button class="primary">Commit structural changes</button>
+                  </form>
+                  <form method="post" action="/skills/{{s.id}}/steps/{{st.id}}/delete" onsubmit="return confirm('Delete this progression step permanently?')">
+                    <button class="btn danger-btn" style="width: 100%; margin-top: 10px;">Purge node from tree</button>
+                  </form>
+                </div>
+              </div>
+            {% else %}
+              <p class="muted">No micro-progression architecture built inside this tree yet.</p>
+            {% endfor %}
+          </div>
+        </details>
+        
+        <div class="skill-step-toolbar" style="margin-top: 14px;">
+          <button class="btn tiny" type="button" onclick="openModal('addStep{{s.id}}')">+ Add node</button>
+          <button class="btn tiny" type="button" onclick="openModal('editSkill{{s.id}}')">Modify matrix</button>
+        </div>
+        
+        <div id="editSkill{{s.id}}" class="modal">
+          <div class="modal-panel skill-modal-panel">
+            <button type="button" class="x" onclick="closeModal('editSkill{{s.id}}')">×</button>
+            <p class="eyebrow">Core Parameters</p>
+            <h2>Modify: {{s.name}}</h2>
+            <form method="post" class="form-compact skill-edit-modal-form">
+              <input type="hidden" name="skill_id" value="{{s.id}}">
+              <div class="form-grid two">
+                <div><label>Current Level</label><input name="current_level" type="number" value="{{s.current_level}}"></div>
+                <div><label>Target Level</label><input name="target_level" type="number" value="{{s.target_level}}"></div>
+              </div>
+              <label>Global Progress Override %</label>
+              <input name="progress" type="number" value="{{s.progress}}" min="0" max="100">
+              <label>Core Strategic Notes</label>
+              <textarea name="notes">{{s.notes}}</textarea>
+              <button class="primary">Update skill profile</button>
+            </form>
+          </div>
+        </div>
+        
+        <div id="addStep{{s.id}}" class="modal">
+          <div class="modal-panel">
+            <button type="button" class="x" onclick="closeModal('addStep{{s.id}}')">×</button>
+            <h2>Append Tree Node</h2>
+            <form method="post" action="/skills/{{s.id}}/steps/add" class="form-compact">
+              <label>Node Sequence Index</label>
+              <input name="step_order" type="number" value="{{s.steps|length + 1}}">
+              <label>Node Target Milestone</label>
+              <input name="title" required placeholder="e.g., 5s Advanced Tuck Hold">
+              <label>Technical Description / Form cues</label>
+              <textarea name="description"></textarea>
+              <label class="check"><input type="checkbox" name="completed"> Pre-verify node as clear</label>
+              <button class="primary">Inject node</button>
+            </form>
+          </div>
+        </div>
+        
+      </article>
+    {% else %}
+      <div class="card empty">No execution matrices or skill vectors initiated.</div>
+    {% endfor %}
   </section>
 </div>
+
+<style>
+.align-end-mobile {
+  align-items: flex-end;
+}
+.skill-details-panel summary::-webkit-details-marker {
+  display: none;
+}
+@media (max-width: 760px) {
+  .align-end-mobile {
+    align-items: stretch !important;
+  }
+  .skill20-node-strip {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 6px;
+  }
+}
+</style>
+
+<script>
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.add('show');
+    document.body.classList.add('modal-lock');
+  }
+}
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-lock');
+  }
+}
+window.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal')) {
+    closeModal(e.target.id);
+  }
+});
+</script>
 {% endblock %}

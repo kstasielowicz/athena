@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ATHENA Training OS</title>
+  <title>ATHENA</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div id="pageLoader" class="page-loader"><div class="loader-card"><div class="loader-mark">A</div><b>Loading ATHENA module</b><span>Preparing training data...</span></div></div>
 <aside class="sidebar">
   <div class="brand"><div class="logo">A</div><div><b>ATHENA</b><span>Strength Intelligence</span></div></div>
+  <div class="side-card"><small><a href="/architecture">Demo product</a></small></div>
   <nav class="side-nav">
     <div class="nav-section"><span>Core</span>
       <a href="/" class="nav-link {% if request.path=='/' %}active{% endif %}">Dashboard</a>
@@ -28,6 +29,7 @@
       <a href="/recovery" class="nav-link {% if request.path.startswith('/recovery') %}active{% endif %}">Recovery Center</a>
       <a href="/intelligence" class="nav-link {% if request.path.startswith('/intelligence') %}active{% endif %}">Athlete Intelligence</a>
       <a href="/achievements" class="nav-link {% if request.path.startswith('/achievements') %}active{% endif %}">Achievements</a>
+      <a href="/goals" class="nav-link {% if request.path.startswith('/goals') %}active{% endif %}">Goals</a>
       <a href="/skills" class="nav-link {% if request.path.startswith('/skills') %}active{% endif %}">Skill System</a>
       <a href="/quests" class="nav-link {% if request.path.startswith('/quests') %}active{% endif %}">Quests</a>
     </div>
@@ -40,11 +42,11 @@
       <a href="/import-hevy" class="nav-link {% if request.path.startswith('/import-hevy') %}active{% endif %}">Hevy Import</a>
     </div>
     <div class="nav-section"><span>Future</span>
-      <a href="/coaching" class="nav-link {% if request.path == '/coaching' %}active{% endif %}">Coaching</a>
+      <a href="/coaching" class="nav-link {% if request.path == '/coaching' %}active{% endif %}">Coaching 🔒</a>
       <a href="/roadmap" class="nav-link {% if request.path.startswith('/roadmap') %}active{% endif %}">Roadmap</a>
     </div>
   </nav>
-  <div class="side-card"><small>Demo product</small><b>Performance Engine</b><p>Training execution, progression, athlete intelligence, analytics and gamified consistency in one local SQLite module.</p></div>
+  <!-- <div class="side-card"><small>Demo product</small><b>Performance Engine</b><p>Training execution, progression, athlete intelligence, analytics and gamified consistency in one local SQLite module.</p></div> -->
 </aside>
 <main class="main content-enter">
   <header class="topbar"><div><p class="eyebrow">Performance tracking module</p><h1>{% block title %}{% endblock %}</h1></div>

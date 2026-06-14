@@ -1,4 +1,90 @@
-{% extends 'base.html' %}{% block title %}{{ex.name}} Progress{% endblock %}{% block content %}
-<div class="grid cols-3"><section class="card hero"><p class="eyebrow">Exercise progress</p><h2>{{ex.name}}</h2><p class="muted">{{ex.description}}</p><span class="pill green">Best score {{best}}</span></section><section class="card" style="grid-column:span 2"><h3>Progress chart</h3>{% if points %}<div class="progress-chart tooltip-chart">{% for p in points %}<div data-tooltip="{{p.date}} - {{p.workout}} - {{p.display}} - score {{p.score}}" title="{{p.date}} - {{p.display}}"><b style="height:{{(p.score / max_score * 180)|round}}px"></b><span>{{p.date[5:]}}</span></div>{% endfor %}</div>{% else %}<p class="muted">No history yet.</p>{% endif %}</section></div>
-<section class="card"><h3>History</h3><table><tr><th>Date</th><th>Workout</th><th>Result</th><th>Score</th></tr>{% for p in points|reverse %}<tr><td>{{p.date}}</td><td>{{p.workout}}</td><td>{{p.display}}</td><td>{{p.score}}</td></tr>{% endfor %}</table></section>
+{% extends 'base.html' %}
+{% block title %}{{ex.name}} Progress Matrix{% endblock %}
+{% block content %}
+
+<div class="grid cols-3">
+  
+  <section class="card hero">
+    <p class="eyebrow">Exercise Progress</p>
+    <h2>{{ex.name}}</h2>
+    <p class="muted">{{ex.description or 'No analytical parameters mapped to this movement profile yet.'}}</p>
+    <div class="tag-row" style="margin-top: 14px;">
+      <span class="pill green">Peak Output: {{best or '-'}}</span>
+      <span class="pill soft">{{ex.exercise_type}}</span>
+    </div>
+  </section>
+
+  <section class="card" style="grid-column: span 2;">
+    <div class="section-head">
+      <div>
+        <h3>Progression Vector Chart</h3>
+        <p class="muted">Historical load variations over active training cycles.</p>
+      </div>
+    </div>
+    
+    {% if points %}
+      <div style="width: 100%; margin-top: 10px; overflow-x: auto; overflow-y: visible; padding-top: 40px; padding-bottom: 10px;">
+        
+        <div class="progress-chart tooltip-chart" style="overflow-x: visible !important; overflow-y: visible !important; height: 160px; align-items: flex-end; display: flex; gap: 12px;">
+          {% for p in points %}
+            {% set bar_height = (p.score / (max_score or 1) * 110)|round|int %}
+            <div class="chart-bar-node" data-tooltip="{{p.date}} — Score: {{p.score}} — {{p.display}}" style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative;">
+              
+              <b style="height: {{ bar_height if bar_height > 6 else 6 }}px; min-height: 6px; background: linear-gradient(180deg, var(--accent), var(--accent2)); width: 24px; display: block; border-radius: 4px 4px 0 0;"></b>
+              
+              <span style="font-size: 11px; font-family: monospace; opacity: 0.7; margin-top: 8px; display: block; white-space: nowrap;">{{p.date[5:]}}</span>
+            </div>
+          {% endfor %}
+        </div>
+        
+      </div>
+    {% else %}
+      <div class="empty" style="margin-top: 20px;">
+        <p class="muted">No historical data logs generated for this exercise vector yet.</p>
+      </div>
+    {% endif %}
+  </section>
+  
+</div>
+<br>
+
+<section class="card">
+  <div class="section-head">
+    <h3>Historical Performance Logs</h3>
+  </div>
+  
+  <div class="table-scroll" style="margin-top: 14px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Execution Date</th>
+          <th>Workout Session</th>
+          <th>Tracked Output Result</th>
+          <th>Calculated Performance Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in points|reverse %}
+          <tr>
+            <td>{{p.date}}</td>
+            <td><b>{{p.workout}}</b></td>
+            <td><span class="pill soft">{{p.display}}</span></td>
+            <td><b style="color: var(--accent);">{{p.score}} pts</b></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+/* Nadpisujemy zachowanie pozycjonowania dynamicznego tylko dla tego konkretnego wykresu */
+.chart-bar-node[data-tooltip]:hover:after {
+  bottom: calc(100% + 6px) !important; /* Przesuwa dymek idealnie nad słupek */
+  z-index: 9999 !important;            /* Wymusza renderowanie na samym wierzchu */
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+</style>
+
 {% endblock %}

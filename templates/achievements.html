@@ -1,7 +1,124 @@
-{% extends 'base.html' %}{% block title %}Achievements 3.0{% endblock %}{% block content %}
+{% extends 'base.html' %}
+{% block title %}Achievements 3.0{% endblock %}
+{% block content %}
 {% set rank = athlete_rank_from_xp(gamification.xp) %}
-<section class="card hero achievements-hero-v3"><div><p class="eyebrow">ATHENA Gamification</p><h2>Achievement System 3.0</h2><p class="muted">Categories, rarity, featured achievements and hidden milestones.</p></div><div class="level-orb"><b>{{gamification.level}}</b><span>LVL</span></div></section><br>
-<section class="achievement-top-grid"><article class="card xp-panel"><div class="section-head"><div><h3>Level progress</h3><p class="muted">{{gamification.xp}} XP total · {{gamification.next}} XP until next level.</p></div><b>{{gamification.progress}} / 250 XP</b></div><div class="xp-bar"><b style="width:{{(gamification.progress/250*100)|round(0)}}%"></b></div></article><article class="card"><h3>Rank</h3><div class="section-head"><b>{{rank.name}}</b><small>{{rank.progress}}%</small></div><p class="muted">{{rank.description}} · Next {{rank.next}}</p><div class="mini-progress"><span style="width:{{rank.progress}}%"></span></div></article><article class="card"><h3>Featured</h3>{% for a in featured_achievements(3) %}<span class="pill green">{{a.icon}} {{a.title}}</span>{% else %}<p class="muted">Unlock achievements to feature them.</p>{% endfor %}</article></section><br>
 {% set cats = catalog|groupby('category') %}
-<div class="achievement-category-grid achievement-v11-grid achievement-v3-grid">{% for category, items in cats %}<section class="card achievement-category-card"><div class="section-head"><div><p class="eyebrow">{{category}}</p><h3>{{items|selectattr('unlocked')|list|length}} / {{items|length}} unlocked</h3></div></div><div class="achievement-list-v10">{% for b in items %}<article class="achievement-row-v11 {{'unlocked' if b.unlocked else 'locked'}} rarity-{{b.rarity|lower}}"><span class="ach-icon">{{b.icon}}</span><div><div class="achievement-row-title"><b>{{b.title}}</b><em>{{b.rarity}}</em></div><small>{{b.description}}</small><div class="mini-progress"><span style="width:{{b.progress}}%"></span></div><small>{{b.current}} / {{b.target}}</small></div><strong>{{'Unlocked' if b.unlocked else b.progress|string + '%'}}</strong></article>{% endfor %}</div></section>{% endfor %}<section class="card achievement-category-card"><div class="section-head"><div><p class="eyebrow">Hidden</p><h3>Secret milestones</h3></div></div><div class="achievement-row-v11 locked rarity-legendary"><span class="ach-icon">?</span><div><b>Hidden Achievement</b><small>Keep training to reveal this milestone.</small><div class="mini-progress"><span style="width:15%"></span></div></div><strong>Secret</strong></div></section></div>
+
+<section class="card hero achievements-hero-v2">
+  <div>
+    <p class="eyebrow">ATHENA Gamification</p>
+    <h2>Performance Badges & Trophies</h2>
+    <p class="muted">Track your athlete progression tiers, unlock legendary milestones, and claim talent points.</p>
+  </div>
+  <div class="level-orb">
+    <b>{{gamification.level}}</b>
+    <span>LVL</span>
+  </div>
+</section>
+
+<section class="grid cols-3" style="margin-top: 24px;">
+  
+  <article class="card xp-panel" style="margin-bottom: 0;">
+    <div class="section-head">
+      <div>
+        <h3 style="margin: 0 0 4px 0;">Level Progress</h3>
+        <p class="muted">{{gamification.xp}} total XP · {{gamification.next}} XP until next level.</p>
+      </div>
+      <b style="color: var(--accent);">{{gamification.pct}}%</b>
+    </div>
+    <div class="xp-bar" style="margin-top: 12px;">
+      <b style="width:{{ gamification.pct }}%"></b>
+    </div>
+  </article>
+
+  <article class="card" style="margin-bottom: 0;">
+    <div class="section-head">
+      <h3 style="margin: 0;">Athlete Rank</h3>
+      <b style="color: var(--accent);">{{rank.name}}</b>
+    </div>
+    <p class="muted" style="margin: 8px 0 12px 0;">{{rank.description}} · Next tier in {{rank.next}}</p>
+    <div class="mini-progress">
+      <span style="width:{{rank.progress}}%"></span>
+    </div>
+  </article>
+
+  <article class="card" style="margin-bottom: 0;">
+    <h3 style="margin: 0 0 12px 0;">Featured</h3>
+    <div class="tag-row">
+      {% for a in featured_achievements(3) %}
+        <span class="pill green">{{a.icon}} {{a.title}}</span>
+      {% else %}
+        <p class="muted" style="margin: 0;">Unlock challenges to feature badges.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<div class="achievement-v11-grid" style="display: flex; flex-direction: column; gap: 20px; margin-top: 24px; width: 100%;">
+  
+  {% for category, items in cats %}
+    <section class="card achievement-category-card" style="margin-bottom: 0; width: 100%;">
+      <div class="section-head" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+        <div>
+          <p class="eyebrow">Progression Matrix</p>
+          <h3 style="margin: 4px 0 0 0; font-size: 22px;">{{category}}</h3>
+        </div>
+        <span class="pill green" style="font-weight: bold;">
+          {{items|selectattr('unlocked')|list|length}} / {{items|length}} Cleared
+        </span>
+      </div>
+      
+      <div class="achievement-list-v10" style="display: flex; flex-direction: column; gap: 12px;">
+        {% for b in items %}
+          <article class="achievement-row-v11 {{'unlocked' if b.unlocked else 'locked'}} rarity-{{b.rarity|lower}}" style="margin-bottom: 0; width: 100%;">
+            <span class="ach-icon">{{b.icon}}</span>
+            <div style="flex: 1; min-width: 0;">
+              <div class="achievement-row-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <b style="font-size: 15px; color: var(--text);">{{b.title}}</b>
+                <small class="muted" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px;">{{b.rarity}}</small>
+              </div>
+              <p class="muted" style="margin: 4px 0 8px 0; font-size: 13px; line-height: 1.4;">{{b.description}}</p>
+              
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="mini-progress" style="flex: 1; margin: 0;">
+                  <span style="width:{{b.progress}}%"></span>
+                </div>
+                <small class="muted" style="font-family: monospace; font-size: 11px; flex-shrink: 0;">{{b.current}} / {{b.target}}</small>
+              </div>
+            </div>
+            <strong style="font-family: monospace; font-size: 14px; margin-left: 16px; color: {% if b.unlocked %}var(--accent){% else %}var(--muted){% endif %};">
+              {{'CLEAR' if b.unlocked else b.progress|string + '%'}}
+            </strong>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+
+  <section class="card achievement-category-card" style="margin-bottom: 0; width: 100%;">
+    <div class="section-head" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+      <div>
+        <p class="eyebrow">Classified Core</p>
+        <h3 style="margin: 4px 0 0 0; font-size: 22px;">Secret Milestones</h3>
+      </div>
+    </div>
+    <div class="achievement-list-v10">
+      <div class="achievement-row-v11 locked rarity-legendary" style="margin-bottom: 0; width: 100%;">
+        <span class="ach-icon">?</span>
+        <div style="flex: 1; min-width: 0;">
+          <div class="achievement-row-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <b style="font-size: 15px; color: var(--text);">Hidden Milestone</b>
+            <small style="font-weight: 800; text-transform: uppercase; color: var(--gold); font-size: 10px;">Legendary</small>
+          </div>
+          <p class="muted" style="margin: 4px 0 8px 0; font-size: 13px; line-height: 1.4;">Keep executing your training protocols to reveal this matrix milestone layer.</p>
+          <div class="mini-progress" style="margin: 0; max-width: 100%;">
+            <span style="width:15%"></span>
+          </div>
+        </div>
+        <strong style="color: var(--gold); font-family: monospace; font-size: 14px; margin-left: 16px;">LOCKED</strong>
+      </div>
+    </div>
+  </section>
+  
+</div>
 {% endblock %}

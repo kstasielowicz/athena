@@ -1,40 +1,207 @@
-{% extends 'base.html' %}{% block title %}Goals & Achievements{% endblock %}{% block content %}
-<div class="goals-page">
-  <section class="card goal-form-card"><h3>Add goal</h3><form method="post" class="goal-create-form"><label>Title</label><input name="title" required><label>Metric</label><input name="metric" placeholder="Pull Up, RIS UPPER, Plank"><div class="form-grid two"><div><label>Target</label><input name="target" type="number" step="0.1" required></div><div><label>Current</label><input name="current" type="number" step="0.1"></div></div><label>Unit</label><input name="unit" placeholder="kg, pts, sec"><label>Notes</label><textarea name="notes"></textarea><button class="primary">Save goal</button></form></section>
+{% extends 'base.html' %}
+{% block title %}Goals & Achievements{% endblock %}
+{% block content %}
 
-  <section class="card goals-list-card"><div class="section-head"><div><h3>Goals</h3><p class="muted">Clean goal cards with quick status actions and modal editing.</p></div></div>
-    <div class="goals-clean-grid">
-      {% for g in rows %}{% set pct = (g.current / g.target * 100) if g.target else 0 %}
-      <article class="goal-clean-card {% if g.status == 'Completed' %}completed{% endif %}">
-        <div class="goal-clean-top"><div><small>{{g.metric}}</small><h3>{{g.title}}</h3></div><span class="pill {% if g.status == 'Completed' %}green{% else %}soft{% endif %}">{{g.status or 'Active'}}</span></div>
-        <div class="goalbar"><b style="width:{{ [pct,100]|min }}%"></b></div>
-        <div class="goal-values"><span><b>{{'%.1f'|format(g.current or 0)}}</b> current</span><span><b>{{'%.1f'|format(g.target or 0)}}</b> target</span><span><b>{{g.unit}}</b> unit</span></div>
-        {% if g.notes %}<p class="goal-note">{{g.notes}}</p>{% endif %}
-        <div class="goal-clean-actions">
-          <button class="btn icon-btn" type="button" onclick="openGoalModal('goalEdit{{g.id}}')">✎ Edit</button>
-          <form method="post" action="{{url_for('goal_update', gid=g.id)}}" class="inline-action">
-            {% if g.status == 'Completed' %}<button class="btn" name="action" value="reopen">Reopen</button>{% else %}<button class="primary" name="action" value="complete">Mark completed</button>{% endif %}
-          </form>
+<section class="card hero clean-hero">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">ATHENA Execution Layer</p>
+      <h2>Macro Targets & Core Milestones</h2>
+      <p class="muted">Formulate precision metrics, manage active physical targets, and monitor real realized microcycle challenge unlocks inside your operating system.</p>
+    </div>
+  </div>
+</section>
+<br>
+
+<div class="goals-page skill-layout clean-skill-layout skill20-layout">
+  
+  <section class="card goal-form-card">
+    <p class="eyebrow">Strategic Design</p>
+    <h3>Add Target Goal</h3>
+    <form method="post" class="goal-create-form form-compact">
+      <label>Goal Title</label>
+      <input name="title" required placeholder="e.g., Weighted Pull-Up Mastery">
+      
+      <label>Target Metric Vector</label>
+      <input name="metric" placeholder="e.g., Pull Up, RIS UPPER, Plank">
+      
+      <div class="form-grid two">
+        <div>
+          <label>Target Threshold</label>
+          <input name="target" type="number" step="0.1" required>
         </div>
-      </article>
-      <div id="goalEdit{{g.id}}" class="modal"><div class="modal-panel goal-modal-panel"><button class="x" type="button" onclick="closeGoalModal('goalEdit{{g.id}}')">×</button><p class="eyebrow">Edit goal</p><h2>{{g.title}}</h2>
-        <form method="post" action="{{url_for('goal_update', gid=g.id)}}" class="goal-modal-form">
-          <label>Title</label><input name="title" value="{{g.title}}">
-          <label>Metric</label><input name="metric" value="{{g.metric}}">
-          <div class="form-grid two"><div><label>Current</label><input name="current" type="number" step="0.1" value="{{g.current}}"></div><div><label>Target</label><input name="target" type="number" step="0.1" value="{{g.target}}"></div></div>
-          <div class="form-grid two"><div><label>Unit</label><input name="unit" value="{{g.unit}}"></div><div><label>Status</label><select name="status"><option {% if g.status!='Completed' %}selected{% endif %}>Active</option><option {% if g.status=='Completed' %}selected{% endif %}>Completed</option></select></div></div>
-          <label>Notes</label><textarea name="notes">{{g.notes}}</textarea>
-          <button class="primary" name="action" value="save">Save changes</button>
-        </form>
-      </div></div>
+        <div>
+          <label>Current Status</label>
+          <input name="current" type="number" step="0.1" value="0">
+        </div>
+      </div>
+      
+      <label>Measurement Unit</label>
+      <input name="unit" placeholder="kg, pts, sec, reps">
+      
+      <label>Tactical Notes</label>
+      <textarea name="notes" placeholder="Form constraints, programmatic pacing schedules, or baseline markers..."></textarea>
+      
+      <button class="primary">Initialize Goal</button>
+    </form>
+  </section>
+
+  <section class="card goals-list-card">
+    <div class="section-head" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+      <div>
+        <p class="eyebrow">Active Protocols</p>
+        <h3>Strategic Macro Benchmarks</h3>
+      </div>
+    </div>
+    
+    <div class="goals-clean-grid" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+      {% for g in rows %}
+        {% set pct = (g.current / g.target * 100) if g.target else 0 %}
+        <article class="goal-clean-card card {% if g.status == 'Completed' %}completed{% endif %}" style="margin-bottom: 0; width: 100%;">
+          
+          <div class="goal-clean-top">
+            <div>
+              <span class="pill green" style="font-size: 11px; padding: 3px 8px;">{{g.metric}}</span>
+              <h3 style="margin-top: 8px;">{{g.title}}</h3>
+            </div>
+            <span class="pill {% if g.status == 'Completed' %}green{% else %}soft{% endif %}">
+              {{g.status or 'Active'}}
+            </span>
+          </div>
+          
+          <div class="goalbar" title="Mastery progress: {{ pct|round(1) }}%">
+            <b style="width:{{ [pct, 100]|min }}%"></b>
+          </div>
+          
+          <div class="goal-values">
+            <span><b>{{'%.1f'|format(g.current or 0)}}</b> current</span>
+            <span><b>{{'%.1f'|format(g.target or 0)}}</b> target</span>
+            <span><b>{{g.unit}}</b> unit</span>
+          </div>
+          
+          {% if g.notes %}
+            <p class="metric-note" style="margin-top: 12px;">{{g.notes}}</p>
+          {% endif %}
+          
+          <div class="goal-clean-actions" style="margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px;">
+            <button class="btn tiny icon-btn" type="button" onclick="openGoalModal('goalEdit{{g.id}}')">✎ Edit Parameters</button>
+            <form method="post" action="{{url_for('goal_update', gid=g.id)}}" class="inline-action" style="display: inline;">
+              {% if g.status == 'Completed' %}
+                <button class="btn tiny" name="action" value="reopen">Reopen Blueprint</button>
+              {% else %}
+                <button class="primary tiny" name="action" value="complete">Mark Completed</button>
+              {% endif %}
+            </form>
+          </div>
+        </article>
+
+        <div id="goalEdit{{g.id}}" class="modal">
+          <div class="modal-panel goal-modal-panel">
+            <button class="x" type="button" onclick="closeGoalModal('goalEdit{{g.id}}')">×</button>
+            <p class="eyebrow">Parameters Matrix</p>
+            <h2>Modify Goal: {{g.title}}</h2>
+            
+            <form method="post" action="{{url_for('goal_update', gid=g.id)}}" class="goal-modal-form form-compact">
+              <label>Goal Title</label>
+              <input name="title" value="{{g.title}}">
+              
+              <label>Target Metric Vector</label>
+              <input name="metric" value="{{g.metric}}">
+              
+              <div class="form-grid two">
+                <div>
+                  <label>Current Status</label>
+                  <input name="current" type="number" step="0.1" value="{{g.current}}">
+                </div>
+                <div>
+                  <label>Target Threshold</label>
+                  <input name="target" type="number" step="0.1" value="{{g.target}}">
+                </div>
+              </div>
+              
+              <div class="form-grid two">
+                <div>
+                  <label>Measurement Unit</label>
+                  <input name="unit" value="{{g.unit}}">
+                </div>
+                <div>
+                  <label>Ecosystem Status</label>
+                  <select name="status">
+                    <option {% if g.status != 'Completed' %}selected{% endif %}>Active</option>
+                    <option {% if g.status == 'Completed' %}selected{% endif %}>Completed</option>
+                  </select>
+                </div>
+              </div>
+              
+              <label>Tactical Notes</label>
+              <textarea name="notes">{{g.notes}}</textarea>
+              
+              <button class="primary" name="action" value="save" style="width: 100%; margin-top: 10px;">Save Target Profile</button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <div class="card empty" style="width: 100%;">No active performance goals or macro targets initiated yet.</div>
       {% endfor %}
     </div>
   </section>
+  
 </div>
-<section class="card"><h3>Achievements</h3><div class="achievement-grid">{% for title, ok, desc in achievements %}<div class="achievement {% if ok %}unlocked{% endif %}"><b>{{title}}</b><span>{{desc}}</span></div>{% endfor %}</div></section>
+<br>
+
+<section class="card achievement-category-card">
+  <div class="section-head" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+    <div>
+      <p class="eyebrow">System Challenges</p>
+      <h3>Ecosystem Achievements</h3>
+    </div>
+  </div>
+  
+  <div class="achievement-list-v10" style="display: flex; flex-direction: column; gap: 12px;">
+    {% for title, ok, desc in achievements %}
+      <article class="achievement-row-v11 {% if ok %}unlocked{% else %}locked{% endif %}" style="margin-bottom: 0; width: 100%;">
+        <span class="ach-icon">{% if ok %}✓{% else %}🔒{% endif %}</span>
+        <div style="flex: 1; min-width: 0;">
+          <div class="achievement-row-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <b style="font-size: 15px; color: var(--text);">{{title}}</b>
+          </div>
+          <p class="muted" style="margin: 4px 0 0 0; font-size: 13px; line-height: 1.4;">{{desc}}</p>
+        </div>
+        <strong style="font-family: monospace; font-size: 14px; margin-left: 16px; color: {% if ok %}var(--accent){% else %}var(--muted){% endif %};">
+          {% if ok %}UNLOCKED{% else %}LOCKED{% endif %}
+        </strong>
+      </article>
+    {% else %}
+      <p class="muted">No system achievement configurations found.</p>
+    {% endfor %}
+  </div>
+</section>
+
 <script>
-function openGoalModal(id){const modal=document.getElementById(id); if(modal.parentElement!==document.body){document.body.appendChild(modal);} modal.classList.add('show')}
-function closeGoalModal(id){document.getElementById(id).classList.remove('show')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))})
+function openGoalModal(id){
+  const modal = document.getElementById(id); 
+  if (modal) {
+    if (modal.parentElement !== document.body) {
+      document.body.appendChild(modal);
+    } 
+    modal.classList.add('show');
+    document.body.classList.add('modal-lock');
+  }
+}
+function closeGoalModal(id){
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-lock');
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal.show').forEach(m => {
+      m.classList.remove('show');
+      document.body.classList.remove('modal-lock');
+    });
+  }
+});
 </script>
 {% endblock %}

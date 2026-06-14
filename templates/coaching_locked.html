@@ -1,49 +1,95 @@
-{% extends 'base.html' %}{% block title %}Coaching Module{% endblock %}{% block content %}
+{% extends 'base.html' %}
+{% block title %}Coaching Module{% endblock %}
+{% block content %}
+
 <section class="card hero coaching-hero">
   <div class="workout-head">
     <div>
-      <p class="eyebrow">Locked future module</p>
-      <h2>Coach-led training is coming to ATHENA</h2>
-      <p class="muted">ATHENA stays a standalone athlete platform. This module is a preview of a future upgrade where athletes will be able to train under a coach, and experienced users may eventually manage athletes as coaches.</p>
+      <p class="eyebrow">Ecosystem Expansion Layer</p>
+      <h2>ATHENA Collective: Professional Coaching & Nutrition Marketplace</h2>
+      <p class="muted">While the current ATHENA Core remains your standalone elite performance engine, the upcoming Collective Expansion bridges the gap between raw data analytics and specialized human guidance. Access world-class strength coaches, clinical dietitians, and metabolic experts directly inside your operating system.</p>
     </div>
-    <span class="pill">Locked / in development</span>
+    <span class="pill status-pill warning">Locked Preview · Phase 2 Pipeline</span>
   </div>
 </section>
 
-<div class="grid cols-3 coaching-grid">
+<div class="grid cols-3 coaching-grid" style="margin-top: 24px;">
   <div class="card feature-card">
-    <p class="eyebrow">For athletes</p>
-    <h3>Train under a coach</h3>
-    <p class="muted">Receive assigned programs, weekly check-ins, session feedback and progress guidance inside ATHENA.</p>
+    <p class="eyebrow">For the Athlete</p>
+    <h3>Data-Driven Mentorship</h3>
+    <p class="muted">Your coach doesn't just send static spreadsheets. They gain a live, high-fidelity stream of your active e1RM progressions, ACWR stress loads, and daily fatigue signals to adjust your next block in real-time.</p>
   </div>
+  
   <div class="card feature-card">
-    <p class="eyebrow">For future coaches</p>
-    <h3>Coach capability</h3>
-    <p class="muted">A future path for managing athletes, assigning programs and reacting to training signals without adding a separate coach dashboard yet.</p>
+    <p class="eyebrow">For the Dietitian</p>
+    <h3>Metabolic Alignment</h3>
+    <p class="muted">Clinical nutritionists and macro coaches integrate directly into your Biometric Matrix. Food logs, macro partitioning, and body fat thresholds are calculated alongside active training volume to maximize recovery.</p>
   </div>
-  <div class="card advisor {{signal.tone}}">
-    <p class="eyebrow">Coach Signal preview</p>
-    <h3>{{signal.title}}</h3>
-    <p>{{signal.text}}</p>
+  
+  <div class="card advisor {{signal.tone if signal else 'info'}}">
+    <p class="eyebrow">Ecosystem Signal Preview</p>
+    <h3>{{ signal.title if signal else 'Telemetry Synced' }}</h3>
+    <p class="muted">{{ signal.text if signal else 'The framework is pre-wired to pipe active training data blocks directly to accredited coaches without leaking private telemetry hooks.' }}</p>
   </div>
 </div>
 
-<section class="card roadmap-panel">
+<section class="card" style="margin-top: 24px;">
   <div class="section-head">
     <div>
-      <p class="eyebrow">Planned scope</p>
-      <h3>What this module may unlock later</h3>
+      <p class="eyebrow">Flexible Economy</p>
+      <h3>Decentralized Tiered Pricing Structure</h3>
+      <p class="muted">ATHENA enforces no rigid subscription traps. Every certified coach and dietitian operates as an independent business unit, choosing their own price points. You select the exact tier that fits your budget, goals, and depth of needed interaction.</p>
     </div>
-    <span class="pill soft">No separate coach dashboard in this version</span>
   </div>
-  <div class="capability-grid">
-    <span>Coach-athlete relationship</span>
-    <span>Program assignment</span>
-    <span>Weekly check-ins</span>
-    <span>Session feedback</span>
-    <span>Messaging</span>
-    <span>Compliance insights</span>
+  
+  <div class="level-list" style="margin-top: 20px;">
+    <div>
+      <b style="font-family: monospace; letter-spacing: 0;">T01</b>
+      <span>
+        <strong style="display: block; font-size: 15px; color: var(--accent); margin-bottom: 4px;">Automated AI Override ($10 – $20 / mo)</strong>
+        Fully algorithmic macro targets and volume suggestions based on automated engine signals. No human coach included in this layer.
+      </span>
+    </div>
+    <div>
+      <b style="font-family: monospace; letter-spacing: 0;">T02</b>
+      <span>
+        <strong style="display: block; font-size: 15px; color: var(--text); margin-bottom: 4px;">Standard Guidance ($50 – $90 / mo)</strong>
+        Perfect for intermediate athletes. Includes monthly program block updates, bi-weekly chat check-ins, and standard compliance tracking from verified coaches.
+      </span>
+    </div>
+    <div>
+      <b style="font-family: monospace; letter-spacing: 0;">T03</b>
+      <span>
+        <strong style="display: block; font-size: 15px; color: var(--gold); margin-bottom: 4px;">Elite Performance Matrix ($150 – $300+ / mo)</strong>
+        Direct access to master-level coaches and sports dietitians. Weekly comprehensive review video feedback, premium daily chat access, manual block overrides, and competition peaking protocols.
+      </span>
+    </div>
   </div>
-  <p class="muted">For now, this remains a clear product-direction screen. The current ATHENA build focuses on the athlete experience first.</p>
 </section>
+
+<section class="card roadmap-panel" style="margin-top: 24px;">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Planned Architectural Scope</p>
+      <h3>Ecosystem Functional Unlocks</h3>
+    </div>
+    <span class="pill soft">Unified Trainee Dashboard Infrastructure</span>
+  </div>
+  
+  <div class="capability-grid" style="margin-top: 16px;">
+    <span>Bidirectional Telemetry Pipeline</span>
+    <span>Clinical Macro & Nutrition Sync</span>
+    <span>Dynamic Marketplace Bidding</span>
+    <span>Coach-Athlete Native Messaging</span>
+    <span>Video Form Review Integration</span>
+    <span>ACWR Shared Safety Alerts</span>
+    <span>Asynchronous Check-in Workflows</span>
+    <span>Trainee Compliance Dashboard</span>
+  </div>
+  
+  <p class="muted" style="margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px;">
+    <strong>Product Direction Notice:</strong> To maintain product purity, ATHENA Core is focusing completely on the raw athlete software engine first. This preview guarantees that all current internal log structures are structurally designed to scale into this premium marketplace layer seamlessly.
+  </p>
+</section>
+
 {% endblock %}

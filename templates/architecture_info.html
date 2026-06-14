@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block title %}System Architecture Specifications{% endblock %}
+{% block content %}
+
+<section class="card hero clean-hero" style="border-left: 3px solid var(--accent);">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow" style="font-family: monospace; letter-spacing: 2px;">DOCUMENTATION MATRIX</p>
+      <h2 style="font-size: 28px; font-weight: 800;">System Architecture & Data Engineering Specifications</h2>
+      <p class="muted">Technical breakdown of the ATHENA platform environment. This manual maps out the core data flow, asynchronous mathematical processing layers, and relational storage schemas running inside the MVP build.</p>
+    </div>
+  </div>
+</section>
+
+<section class="card" style="margin-top: 24px; background: rgba(0,0,0,0.1); border: 1px solid var(--line);">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow" style="font-family: monospace;">PRODUCT IDENTITY</p>
+      <h3>The Naming Genesis: Why ATHENA?</h3>
+      <p class="muted" style="line-height: 1.5; margin-top: 6px;">
+        In ancient mythology, <b>Athena</b> was the goddess of wisdom, tactical execution, and systematic strategy. Unlike other figures who relied purely on raw brute force and uncalculated aggression, Athena achieved success through intelligence, preparation, and structured discipline. 
+      </p>
+      <p class="muted" style="line-height: 1.5; margin-top: 10px;">
+        This concept forms the absolute core philosophy of our platform. The name represents a shift away from blind, traditional training habits. Instead of pushing the body without a plan, <b>ATHENA</b> provides the athlete with data-driven logic, calculated telemetry, and mathematical analysis - ensuring that strategy always guides physical effort.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="skill-layout clean-skill-layout skill20-layout" style="margin-top: 24px;">
+  
+  <article class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--line);">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+      <h3 style="margin: 0; font-size: 18px; font-family: monospace; color: var(--text);">[01] Frontend Layer Specification</h3>
+      <span class="pill soft" style="font-size: 11px; font-family: monospace;">Client-Side
+      </span>
+    </div>
+    
+    <p class="muted" style="font-size: 13px; line-height: 1.5; margin-bottom: 16px;">
+      The client-side interface executes state visualization and collects training telemetry markers directly from user input devices.
+    </p>
+    
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div>
+        <strong style="color: var(--accent); font-family: monospace; font-size: 14px; display: block; margin-bottom: 4px;">· Jinja2 Template Compiling</strong>
+        <p class="muted" style="margin: 0; font-size: 13px; line-height: 1.4;">Dynamically evaluates server-side variables passed from Flask. Compiles real-time athlete profile data streams (XP progression metrics, live macro goals, and active training sessions) directly into clean semantic HTML5 markup text boundaries before browser rendering.</p>
+      </div>
+      
+      <div>
+        <strong style="color: var(--accent); font-family: monospace; font-size: 14px; display: block; margin-bottom: 4px;">· Responsive Full-Width Layout Matrix</strong>
+        <p class="muted" style="margin: 0; font-size: 13px; line-height: 1.4;">Utilizes custom native CSS3 properties and flexible stacked blocks. By completely replacing traditional multi-column grids with vertical layouts for content expansions, the system enforces complete visual layout stability and prevents <b>Layout Shifts</b> across desktop, tablet, and mobile viewports.</p>
+      </div>
+      
+      <div>
+        <strong style="color: var(--accent); font-family: monospace; font-size: 14px; display: block; margin-bottom: 4px;">· Vanilla JavaScript DOM Control</strong>
+        <p class="muted" style="margin: 0; font-size: 13px; line-height: 1.4;">Maintains targeted asynchronous event listeners. Intercepts client-side triggers (such as tapping interactive sports-science pills or handling multi-modal dialog panels) to instantly update specific DOM text nodes without executing costly full-page document refreshes.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="card" style="background: rgba(0,0,0,0.2); border: 1px solid var(--line);">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+      <h3 style="margin: 0; font-size: 18px; font-family: monospace; color: var(--text);">[02] Backend Engine Specification</h3>
+      <span class="pill green" style="font-size: 11px; font-family: monospace; font-weight: bold;">Server-Side Engine</span>
+    </div>
+    
+    <p class="muted" style="font-size: 13px; line-height: 1.5; margin-bottom: 16px;">
+      The server-side micro-engine handles core application state mutations, process routing logic, and advanced mathematical calculation pipelines.
+    </p>
+    
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div>
+        <strong style="color: var(--accent); font-family: monospace; font-size: 14px; display: block; margin-bottom: 4px;">· Flask Process Routing & Controllers</strong>
+        <p class="muted" style="margin: 0; font-size: 13px; line-height: 1.4;">Executes explicit endpoint route configurations. Listens for secure HTTP payload methods (GET/POST), processes incoming structural parameters from web forms, verifies request sanity, and coordinates transactional handshakes between the frontend display and the local system logic.</p>
+      </div>
+      
+      <div>
+        <strong style="color: var(--accent); font-family: monospace; font-size: 14px; display: block; margin-bottom: 4px;">· SQLite3 Relational Data Storage</strong>
+        <p class="muted" style="margin: 0; font-size: 13px; line-height: 1.4;">Operates a fast, serverless transactional data schema file. Manages historical training trails, user state changes, talent point unlock flags, and microcycle wellness parameters using standardized relational structures with optimized query indices for maximum reading speeds.</p>
+      </div>
+      
+      <div>
+        <strong style="color: var(--accent); font-family: monospace; font-size: 14px; display: block; margin-bottom: 4px;">· Biometric Training Physics Calculators</strong>
+        <p class="muted" style="margin: 0; font-size: 13px; line-height: 1.4;">Processes underlying physical and biological algorithms. Automatically computes non-linear single-rep maximal strength vectors using <b>Brzycki's formula</b> anchored against active <b>RPE/RIR records</b>. This core module manages training progression data logic entirely behind the scene layers.</p>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+<section class="card roadmap-panel" style="margin-top: 24px; background: transparent; border: 1px solid var(--line);">
+  <div class="section-head" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+    <div>
+      <p class="eyebrow" style="font-family: monospace;">TELEMETRY LOOP</p>
+      <h3 style="margin: 4px 0 0 0;">Step-by-Step Data Lifecycle Process</h3>
+    </div>
+  </div>
+  
+  <div class="table-scroll">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--line);">
+          <th style="padding: 10px; font-family: monospace; font-size: 12px; color: var(--accent); width: 100px;">PHASE</th>
+          <th style="padding: 10px; font-family: monospace; font-size: 12px; color: var(--accent); width: 180px;">COMPONENT LOCATION</th>
+          <th style="padding: 10px; font-family: monospace; font-size: 12px; color: var(--accent);">TECHNICAL PROCESS & DESCRIPTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 14px 10px; font-family: monospace; font-weight: bold; color: var(--text);">STAGE 01</td>
+          <td style="padding: 14px 10px;"><span class="pill soft" style="font-size: 11px;">Frontend (Client)</span></td>
+          <td style="padding: 14px 10px;" class="muted">
+            The athlete inputs raw training performance metrics (such as repetitions, absolute lifted weight payload, and target proximity to failure markers via the RPE/RIR selection metrics) and triggers a form submit event.
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 14px 10px; font-family: monospace; font-weight: bold; color: var(--text);">STAGE 02</td>
+          <td style="padding: 14px 10px;"><span class="pill green" style="font-size: 11px; font-weight: bold;">Flask Backend (Server)</span></td>
+          <td style="padding: 14px 10px;" class="muted">
+            The Flask routing pipeline catches the secure data bundle. The system instantly initializes background algorithms to extract strength trend changes, registers corresponding gamification XP events, and performs SQL transaction logs to modify the SQLite3 database file state.
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 14px 10px; font-family: monospace; font-weight: bold; color: var(--text);">STAGE 03</td>
+          <td style="padding: 14px 10px;"><span class="pill soft" style="font-size: 11px;">Jinja2 Engine (Compiler)</span></td>
+          <td style="padding: 14px 10px;" class="muted">
+            The background system queries updated identity states and feeds the parameters directly into the compilation layer. Jinja2 generates completely synchronized HTML elements containing fresh progression values and pushes the document down the stream to the client screen.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card roadmap-panel" style="margin-top: 24px; background: transparent; border: 1px solid var(--line);">
+  <div class="section-head" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+    <div>
+      <p class="eyebrow" style="font-family: monospace;">FUTURE PIPELINE</p>
+      <h3 style="margin: 4px 0 0 0;">Future Product Scaling & Architectural Evolution</h3>
+    </div>
+  </div>
+  
+  <div class="table-scroll">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+      <thead>
+        <tr style="border-bottom: 1px solid var(--line);">
+          <th style="padding: 10px; font-family: monospace; font-size: 12px; color: var(--accent); width: 120px;">PHASE TARGET</th>
+          <th style="padding: 10px; font-family: monospace; font-size: 12px; color: var(--accent); width: 200px;">SCALING STRATEGY</th>
+          <th style="padding: 10px; font-family: monospace; font-size: 12px; color: var(--accent);">UPGRADE OBJECTIVE & BUSINESS POTENTIAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 14px 10px; font-family: monospace; font-weight: bold; color: var(--gold);">PHASE 2.0</td>
+          <td style="padding: 14px 10px;"><span class="pill soft" style="font-size: 11px; color: var(--gold); border-color: rgba(244,196,48,0.3);">API Integration</span></td>
+          <td style="padding: 14px 10px;" class="muted">
+            Expanding the data intake capabilities by setting up direct integrations with third-party tracking APIs (like Hevy, Garmin, or Apple Health). The system will use dedicated background workers to parse pagination records and automatically pull historical training sets and daily body mass variables into the SQLite matrix.
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 14px 10px; font-family: monospace; font-weight: bold; color: var(--gold);">PHASE 3.0</td>
+          <td style="padding: 14px 10px;"><span class="pill soft" style="font-size: 11px; color: var(--gold); border-color: rgba(244,196,48,0.3);">Marketplace Infrastructure</span></td>
+          <td style="padding: 14px 10px;" class="muted">
+            Transforming the app from a standalone tracker into a decentralized multi-user platform. We will unlock the currently previewed Coaching and Nutrition modules, allowing registered coaches and dietitians to manage separate client rosters. This will scale the system into a premium, revenue-generating service using a tiered marketplace economy.
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 14px 10px; font-family: monospace; font-weight: bold; color: var(--gold);">PHASE 4.0</td>
+          <td style="padding: 14px 10px;"><span class="pill soft" style="font-size: 11px; color: var(--gold); border-color: rgba(244,196,48,0.3);">Predictive AI Modeling</span></td>
+          <td style="padding: 14px 10px;" class="muted">
+            Replacing basic rule-based threshold warnings with machine learning regression profiles. By parsing comprehensive training logs and wellness patterns over several months, the system will actively forecast potential stagnation phases and automatically prescribe customized deload blocks or modify routine structures before injuries manifest.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}

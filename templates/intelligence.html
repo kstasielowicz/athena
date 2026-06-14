@@ -1,7 +1,170 @@
-{% extends 'base.html' %}{% block title %}Athlete Intelligence{% endblock %}{% block content %}
-<section class="card hero"><p class="eyebrow">ATHENA Intelligence Layer</p><h2>Recovery, plateau, weak-point and RPG attributes</h2><p class="muted">ATHENA now reads training behavior instead of only storing it.</p></section><br>
-<div class="grid cols-4"><div class="card stat"><small>Recovery</small><br><b>{{intelligence.recovery}}/100</b></div><div class="card stat"><small>Readiness</small><br><b>{{intelligence.readiness.score}}/100</b></div><div class="card stat"><small>Fatigue</small><br><b>{{intelligence.fatigue_label}}</b><span>{{intelligence.fatigue}}/10</span></div><div class="card stat"><small>Compliance</small><br><b>{{compliance.rate}}%</b></div></div><br>
-<div class="grid cols-5">{% for a in attributes %}<div class="card stat"><small>{{a.name}}</small><br><b>{{a.score}}</b><div class="mini-progress"><span style="width:{{a.score}}%"></span></div></div>{% endfor %}</div><br>
-<div class="grid cols-2"><section class="card advisor {{signal.tone}}"><p class="eyebrow">Coach Signal</p><h3>{{signal.title}}</h3><p>{{signal.text}}</p>{% for r in signal.reasons %}<span class="pill">{{r}}</span>{% endfor %}</section><section class="card"><h3>Training guidance</h3>{% for w in intelligence.warnings %}<div class="balance-warning"><b>Signal</b><span>{{w}}</span></div>{% endfor %}</section></div><br>
-<div class="grid cols-2"><section class="card"><h3>Plateau detection</h3>{% for p in plateaus %}<div class="balance-warning"><b>{{p.exercise}}</b><span>{{p.text}}</span></div>{% else %}<p class="muted">No major plateau signal detected from current data.</p>{% endfor %}</section><section class="card"><h3>Weak-point detection</h3>{% for w in weak_points %}<div class="balance-warning"><b>{{w.title}}</b><span>{{w.text}}</span></div>{% endfor %}</section></div>
+{% extends 'base.html' %}
+{% block title %}Athlete Intelligence{% endblock %}
+{% block content %}
+
+<section class="card hero">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">ATHENA Intelligence Layer</p>
+      <h2>Biometric Telemetry & Performance Optimization</h2>
+      <p class="muted">ATHENA does not just store your data - it continuously audits your training blocks, decodes neurological wear, flags plateaus, and scales your RPG character attributes based on real realized output.</p>
+    </div>
+    <span class="pill status-pill green">Diagnostics Live</span>
+  </div>
+</section>
+
+<section class="grid cols-4" style="margin-top: 24px;">
+  <div class="card stat">
+    <small>Recovery Coefficient</small>
+    <br><b>{{intelligence.recovery}}/100</b>
+  </div>
+  <div class="card stat">
+    <small>Readiness Index</small>
+    <br><b>{{intelligence.readiness.score}}/100</b>
+  </div>
+  <div class="card stat">
+    <small>Fatigue Label</small>
+    <br><b>{{intelligence.fatigue_label}}</b><span>{{intelligence.fatigue}}/10</span>
+  </div>
+  <div class="card stat">
+    <small>Microcycle Adherence</small>
+    <br><b>{{compliance.rate}}%</b>
+  </div>
+</section>
+
+<section class="grid cols-5" style="margin-top: 24px;">
+  {% for a in attributes %}
+    <div class="card stat">
+      <small>{{a.name}} Matrix</small>
+      <br><b>{{a.score}}</b>
+      <div class="mini-progress" style="margin-top: 8px;">
+        <span style="width:{{a.score}}%"></span>
+      </div>
+    </div>
+  {% endfor %}
+</section>
+
+<section class="grid cols-2" style="margin-top: 24px;">
+  <article class="card advisor {{signal.tone if signal else 'info'}}" style="margin-bottom: 0;">
+    <p class="eyebrow">Neural Coach Signal</p>
+    <h3>{{signal.title if signal else 'System Nominal'}}</h3>
+    <p class="muted" style="line-height: 1.5; margin-bottom: 12px;">{{signal.text if signal else 'No dangerous load overreaches detected.'}}</p>
+    <div class="tag-row">
+      {% for r in signal.reasons %}
+        <span class="pill">{{r}}</span>
+      {% endfor %}
+    </div>
+  </article>
+
+  <article class="card" style="margin-bottom: 0;">
+    <h3>Active Training Guidance</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+      {% for w in intelligence.warnings %}
+        <div class="balance-warning warning">
+          <b>System Signal</b>
+          <span>{{w}}</span>
+        </div>
+      {% else %}
+        <div class="balance-warning good">
+          <b>System Guard</b>
+          <span>Volume parameters and baseline biomechanical balance ratios are fully optimized.</span>
+        </div>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="grid cols-2" style="margin-top: 24px;">
+  <article class="card" style="margin-bottom: 0;">
+    <h3>Stagnation & Plateau Detection</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+      {% for p in plateaus %}
+        <div class="balance-warning danger">
+          <b>{{p.exercise}}</b>
+          <span>{{p.text}}</span>
+        </div>
+      {% else %}
+        <p class="muted" style="margin: 0; padding: 12px 0;">No active stagnation vectors or exercise volume locks detected in this block.</p>
+      {% endfor %}
+    </div>
+  </article>
+
+  <article class="card" style="margin-bottom: 0;">
+    <h3>Anatomical Weak-Point Extraction</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+      {% for w in weak_points %}
+        <div class="balance-warning warning">
+          <b>{{w.title}}</b>
+          <span>{{w.text}}</span>
+        </div>
+      {% else %}
+        <p class="muted" style="margin: 0; padding: 12px 0;">Force generation curves and joint-angle distributions match structural expectations.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="card" style="margin-top: 24px;">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">ATHENA Core Education</p>
+      <h3>Interactive Telemetry Knowledge Base</h3>
+      <p class="muted">Tap on any core sports science vector below to unlock deep system telemetry documentation, sports science definitions, and active app cross-links.</p>
+    </div>
+  </div>
+  
+  <div class="info-tip-grid expanded" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 16px;">
+    
+    <button type="button" class="info-tip" data-tip="RECOVERY COEFFICIENT: Calculated by aggregating systemic sleep architecture scores, heart rate variability (HRV) proxies, and localized muscular soreness reports. A low score triggers automatic fatigue caps on working set volume to shield neural output.">
+      <b>Recovery Score</b><span>Systemic reconstitution</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="READINESS INDEX: A pre-workout daily nervous system status evaluation. It measures your psychometric focus, baseline mood, and subjective energy to determine if your neuromuscular system is primed for absolute maximum intensity (PR attempts) or requires structural deloading.">
+      <b>Readiness Index</b><span>Neurological firing state</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="ACWR LOGIC (Acute-to-Chronic Workload Ratio): Tracks the relationship between short-term strain (7-day average workload) and historical preparedness (28-day chronic volume). Keeping this index strictly inside the 'Sweet Spot' (0.8 - 1.3) accelerates progression while preventing up to 86% of soft tissue injury profiles.">
+      <b>ACWR Math Matrix</b><span>Injury prevention engine</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="RIS INTERFACE (Repetitions In Store): A programmatic calibration utility designed to calculate absolute failure boundaries without risking catastrophic missing patterns. Head to your active configuration engine via the top bar navigation profile to run live velocity or structural load tests. [Link: Open Active Trackers / Workouts]">
+      <b>RIS Calculator Lab</b><span>Dynamic set volume manager</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="RPE & RIR PARADIGM: RPE (Rate of Perceived Exertion) scales from 1 to 10 based directly on RIR (Reps In Reserve). RPE 10 means 0 Reps in Reserve (absolute muscular collapse); RPE 9 means 1 RIR; RPE 8 means 2 RIR. ATHENA anchors your real-time e1RM tracking onto these values to isolate actual force potential from basic high-fatigue logging errors.">
+      <b>RPE / RIR Intensity Scales</b><span>Proximity to muscular failure</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="STRATEGIC DELOAD BLOCKS: A planned, short-term reduction in training stress (typically slashing volume by 40-50% while holding baseline intensity). This allows systemic inflammation to drain, re-sensitizes skeletal muscle tissue receptors to mechanical tension, and resets neurological fatigue back to absolute baseline.">
+      <b>Deload Framework Protocols</b><span>Fatigue drainage & supercompensation</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="MECHANICAL TENSION: The absolute king of muscular hypertrophy. Triggered when high-load working sets or slow-velocity terminal repetitions force the mechanoreceptors of skeletal muscle cells to convert force vectors into chemical synthesis signals. ATHENA monitors your time-under-tension profiles to audit this metric.">
+      <b>Mechanical Tension Load</b><span>Primary driver of muscle growth</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="MACROCYCLE PERIODIZATION: The systematic structuring of training variables across distinct phases. Typically shifts smoothly from high-volume Accumulation blocks (building cross-sectional muscular surface) into high-intensity Intensification pathways designed to condition the nervous system to handle maximal load weights.">
+      <b>Block Periodization</b><span>Volume accumulation to intensity peaks</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="PLATEAU MITIGATION ALGORITHM: Triggered when an exercise shows zero e1RM or volume progression across three consecutive microcycles. The engine flags this as neurological adaptation lock and suggests programmatic variation (e.g., swapping variations or utilizing cluster sets).">
+      <b>Plateau Signals</b><span>Stagnation decoding</span>
+    </button>
+
+  </div>
+  
+  <p id="intelligenceTipText" class="tip-output" style="margin-top: 16px;">Tap any sports science parameter matrix above to view its technical operational documentation.</p>
+</section>
+
+<script>
+document.querySelectorAll('.info-tip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const outputBox = document.getElementById('intelligenceTipText');
+    if (outputBox) {
+      outputBox.textContent = btn.dataset.tip;
+    }
+  });
+});
+</script>
+
 {% endblock %}

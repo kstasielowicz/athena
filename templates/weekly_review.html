@@ -1,20 +1,150 @@
-{% extends 'base.html' %}{% block title %}Weekly Review{% endblock %}{% block content %}
-<section class="card hero v11-review-hero"><div><p class="eyebrow">Coach-style weekly review</p><h2>{{review.start}} → {{review.end}}</h2><p class="muted">Wins, risks and recommendations based on workouts, recovery, compliance and progression.</p></div><div class="week-score"><b>{{review.week_score}}</b><span>Week Score</span></div></section><br>
+{% extends 'base.html' %}
+{% block title %}Weekly Review{% endblock %}
+{% block content %}
+{% set rank = athlete_rank_from_xp(gamification.xp) %}
+{% set streak2 = streak_system_v2() %}
+
+<section class="card hero v11-review-hero">
+  <div>
+    <p class="eyebrow">Weekly Review</p>
+    <h2>{{review.start}} → {{review.end}}</h2>
+    <p class="muted">Wins, risks, and performance recommendations based on logs, recovery metrics, compliance, and strength progressions.</p>
+  </div>
+  
+  <div class="week-score">
+    <b>{{review.week_score}}</b>
+    <span>Week Score</span>
+  </div>
+</section>
+<br>
+
 <section class="v11-score-grid">
-  <article class="card review-stat"><small>Training compliance</small><b>{{review.compliance}}%</b><p>{{review.workout_count}} / {{review.planned}} planned sessions</p></article>
-  <article class="card review-stat"><small>Overall compliance</small><b>{{review.compliance_engine.overall}}%</b><p>{{review.compliance_engine.label}}</p></article>
-  <article class="card review-stat"><small>Volume</small><b>{{review.volume}}</b><p>estimated kg volume</p></article>
-  <article class="card review-stat"><small>XP earned</small><b>{{review.xp}}</b><p>this week</p></article>
-</section><br>
-<section class="compliance-engine-grid">{% for c in review.compliance_engine.categories %}<article class="card compliance-card"><div class="section-head"><div><p class="eyebrow">{{c.label}}</p><h3>{{c.rate}}%</h3></div><b>{{c.done}}/{{c.target}}</b></div><div class="mini-progress"><span style="width:{{c.rate}}%"></span></div><p class="muted">{{c.hint}}</p></article>{% endfor %}</section><br>
+  <article class="card review-stat">
+    <small>Training Compliance</small>
+    <b>{{review.compliance}}%</b>
+    <p class="muted">{{review.workout_count}} / {{review.planned}} planned sessions</p>
+  </article>
+  
+  <article class="card review-stat">
+    <small>Overall Compliance</small>
+    <b>{{review.compliance_engine.overall}}%</b>
+    <p class="muted">{{review.compliance_engine.label}}</p>
+  </article>
+  
+  <article class="card review-stat">
+    <small>Volume Load</small>
+    <b>{{review.volume|round(0)}}</b>
+    <p class="muted">estimated kg volume</p>
+  </article>
+  
+  <article class="card review-stat">
+    <small>XP Accrued</small>
+    <b>{{review.xp}}</b>
+    <p class="muted">earned this microcycle</p>
+  </article>
+</section>
+<br>
+
+<section class="compliance-engine-grid">
+  {% for c in review.compliance_engine.categories %}
+    <article class="card compliance-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">{{c.label}} Matrix</p>
+          <h3>{{c.rate}}%</h3>
+        </div>
+        <b>{{c.done}} / {{c.target}}</b>
+      </div>
+      
+      <div class="mini-progress" title="{{c.label}} rate: {{c.rate}}%">
+        <span style="width:{{c.rate}}%"></span>
+      </div>
+      <p class="muted" style="margin-top: 8px;">{{c.hint}}</p>
+    </article>
+  {% endfor %}
+</section>
+<br>
+
 <div class="v11-review-columns">
-  <section class="card"><h3>Wins</h3><div class="v10-list">{% for x in review.wins %}<div><span>✓</span><p>{{x}}</p></div>{% endfor %}</div></section>
-  <section class="card"><h3>Risks</h3><div class="v10-list risk-list">{% for x in review.risks %}<div><span>!</span><p>{{x}}</p></div>{% endfor %}</div></section>
-  <section class="card"><h3>Recommendations</h3><div class="v10-list">{% for x in review.recommendations %}<div><span>→</span><p>{{x}}</p></div>{% endfor %}</div></section>
-</div><br>
+  <section class="card">
+    <h3>Wins & Milestones</h3>
+    <div class="v10-list">
+      {% for x in review.wins %}
+        <div><span>✓</span><p>{{x}}</p></div>
+      {% endfor %}
+    </div>
+  </section>
+  
+  <section class="card">
+    <h3>Risks & Fatigue</h3>
+    <div class="v10-list risk-list">
+      {% for x in review.risks %}
+        <div><span>!</span><p>{{x}}</p></div>
+      {% endfor %}
+    </div>
+  </section>
+  
+  <section class="card">
+    <h3>Recommendations</h3>
+    <div class="v10-list">
+      {% for x in review.recommendations %}
+        <div><span>→</span><p>{{x}}</p></div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+<br>
+
 <div class="v10-two-col">
-  <section class="card"><div class="section-head"><div><p class="eyebrow">Smart Today Plan</p><h3>{{smart_plan.title}}</h3></div><span class="tone-pill {{smart_plan.tone}}">{{smart_plan.tone}}</span></div><p class="muted">{{smart_plan.action}}</p></section>
-  <section class="card"><div class="section-head"><div><p class="eyebrow">Weekly MVP</p><h3>{% if review.weekly_mvp %}{{review.weekly_mvp.name}}{% else %}Not enough data yet{% endif %}</h3></div></div><p class="muted">{% if review.weekly_mvp %}{{review.weekly_mvp.display}} · {{review.weekly_mvp.date}}{% else %}Log a few sessions to highlight your best movement of the week.{% endif %}</p></section>
-</div><br>
-<section class="card"><h3>Workouts this week</h3><div class="v10-table">{% for w in review.workouts %}<a href="/workouts/{{w.id}}"><span>{{w.date}}</span><b>{{w.name}}</b><em>{{w.duration_min}} min</em></a>{% else %}<p class="muted">No workouts logged this week yet.</p>{% endfor %}</div></section>
+  <section class="card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Smart Today Plan</p>
+        <h3>{{smart_plan.title}}</h3>
+      </div>
+      <span class="tone-pill {{smart_plan.tone}}">{{smart_plan.tone}}</span>
+    </div>
+    <p class="muted" style="margin-top: 10px;">{{smart_plan.action}}</p>
+  </section>
+  
+  <section class="card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Weekly MVP Movement</p>
+        <h3>
+          {% if review.weekly_mvp %}
+            {{review.weekly_mvp.name}}
+          {% else %}
+            Insufficient Data
+          {% endif %}
+        </h3>
+      </div>
+    </div>
+    <p class="muted" style="margin-top: 10px;">
+      {% if review.weekly_mvp %}
+        PR context verified: {{review.weekly_mvp.display}} · logged on {{review.weekly_mvp.workout_date}}
+      {% else %}
+        Log a few high-intensity working sets to isolate your best movement of the week.
+      {% endif %}
+    </p>
+  </section>
+</div>
+<br>
+
+<section class="card">
+  <div class="section-head">
+    <h3>Logged Protocols This Week</h3>
+  </div>
+  <div class="v10-table" style="margin-top: 10px;">
+    {% for w in review.workouts %}
+      <a class="nav-link" href="/workouts/{{w.id}}">
+        <span>{{w.date}}</span>
+        <b>{{w.name}}</b>
+        <em>{{w.duration_min}} min</em>
+      </a>
+    {% else %}
+      <p class="muted">No workout protocols registered in this microcycle trail yet.</p>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

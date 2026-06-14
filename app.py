@@ -23,6 +23,10 @@ MOODS = ['Excellent','Good','Neutral','Low','Stressed']
 SEXES = ['Men','Women']
 DIFFICULTY = ['Beginner','Intermediate','Advanced']
 EXERCISE_TYPES = ['Strength','Bodyweight','Timed','Distance','Cardio','Interval','Mobility','Custom']
+RPE_TO_RIR = {
+    10.0: 0, 9.5: 0.5, 9.0: 1, 8.5: 1.5, 8.0: 2,
+    7.5: 2.5, 7.0: 3, 6.5: 3.5, 6.0: 4, 5.0: 5
+}
 
 
 def db():
@@ -44,6 +48,79 @@ def insert(sql, params=()):
         cur = conn.execute(sql, params)
         conn.commit()
         return cur.lastrowid
+
+def calculate_e1rm(weight: float, reps: int, rpe: float | None) -> float:
+    """Oblicza szacowany 1RM (Estimated One-Rep Max) przy użyciu formuły Brzyckiego."""
+    if not weight or not reps or weight <= 0 or reps <= 0:
+        return 0.0
+    effective_rpe = float(rpe) if rpe is not None else 10.0
+    rir = RPE_TO_RIR.get(effective_rpe, max(0, int(10.0 - effective_rpe)))
+    effective_reps = reps + rir
+    if effective_reps > 30:
+        return float(weight)
+    e1rm = weight / (1.0278 - (0.0278 * effective_reps))
+    return round(e1rm, 1)
+
+def calculate_acwr_status() -> dict:
+    """Oblicza Acute-to-Chronic Workload Ratio (ACWR) na podstawie objętości treningowej."""
+    today = datetime.date.today()
+    acute_start = (today - datetime.timedelta(days=7)).isoformat()
+    chronic_start = (today - datetime.timedelta(days=28)).isoformat()
+    sql_volume = """
+        SELECT w.date, SUM(CASE WHEN e.exercise_type='Bodyweight' 
+                            THEN (ws.additional_weight * ws.reps) 
+                            ELSE (ws.weight * ws.reps) END) as daily_vol
+        FROM workouts w
+        JOIN workout_exercises we ON we.workout_id = w.id
+        JOIN workout_sets ws ON ws.workout_exercise_id = we.id
+        JOIN exercises e ON e.id = we.exercise_id
+        WHERE w.date >= ?
+        GROUP BY w.date
+    """
+    rows = q(sql_volume, (chronic_start,))
+    acute_total = 0.0
+    chronic_total = 0.0
+    for r in rows:
+        vol = float(r['daily_vol'] or 0.0)
+        chronic_total += vol
+        if r['date'] >= acute_start:
+            acute_total += vol
+    acute_workload = acute_total / 7.0
+    chronic_workload = chronic_total / 28.0
+    if chronic_workload <= 0:
+        return {'ratio': 1.0, 'status': 'Optimal', 'text': 'Zbuduj bazę danych, aby aktywować ACWR.', 'tone': 'neutral'}
+    ratio = round(acute_workload / chronic_workload, 2)
+    if ratio < 0.8:
+        status = 'Under-training'; tone = 'amber'
+        text = f'Too low workload ({ratio}). You are at risk of losing adaptations. You can safely increase volume.'
+    elif 0.8 <= ratio <= 1.3:
+        status = 'Optimal'; tone = 'good'
+        text = f'Sweet Spot ({ratio}). Load is perfectly balanced for progress and injury prevention.'
+    elif 1.3 < ratio <= 1.5:
+        status = 'High Load'; tone = 'warning'
+        text = f'High Load ({ratio}). You are close to the injury risk zone. Monitor recovery.'
+    else:
+        status = 'Danger Zone'; tone = 'danger'
+        text = f'Critical overload ({ratio}!). Drastically higher risk of injury. Recommended immediate deload.'
+    return {'ratio': ratio, 'status': status, 'text': text, 'tone': tone}
+
+def get_xp_for_level(level: int) -> int:
+    if level <= 1: return 0
+    return int(round(200 * math.pow(level - 1, 1.4)))
+
+def get_level_from_xp(total_xp: int) -> dict:
+    lvl = 1
+    while True:
+        needed = get_xp_for_level(lvl + 1)
+        if total_xp < needed: break
+        lvl += 1
+    current_lvl_base = get_xp_for_level(lvl)
+    next_lvl_base = get_xp_for_level(lvl + 1)
+    xp_in_level = total_xp - current_lvl_base
+    xp_needed_for_next = next_lvl_base - current_lvl_base
+    pct = round((xp_in_level / max(1, xp_needed_for_next)) * 100) if xp_needed_for_next > 0 else 100
+    return {'level': lvl, 'xp_in_level': xp_in_level, 'xp_needed_for_next': xp_needed_for_next, 'pct': min(100, pct), 'remaining_xp': max(0, next_lvl_base - total_xp)}
+
 
 
 def clean_int(value, default=None, min_value=None, max_value=None):
@@ -194,6 +271,8 @@ def init_db():
         add_col(conn, 'routine_exercises', 'superset_group', "TEXT DEFAULT ''")
         add_col(conn, 'workout_exercises', 'superset_group', "TEXT DEFAULT ''")
         add_col(conn, 'workout_exercises', 'target_notes', "TEXT DEFAULT ''")
+        add_col(conn, 'workout_sets', 'estimated_1rm', "REAL DEFAULT 0.0")
+        add_col(conn, 'athlete_profile', 'talent_points', "INTEGER DEFAULT 0")
         conn.executescript('''
         CREATE TABLE IF NOT EXISTS exercise_favorites(exercise_id INTEGER PRIMARY KEY, created_at TEXT DEFAULT CURRENT_TIMESTAMP);
         CREATE TABLE IF NOT EXISTS exercise_recent(id INTEGER PRIMARY KEY AUTOINCREMENT, exercise_id INTEGER NOT NULL, context TEXT DEFAULT '', created_at TEXT DEFAULT CURRENT_TIMESTAMP);
@@ -1425,11 +1504,21 @@ def workout_detail(wid):
         q('UPDATE workouts SET name=?,date=?,duration_min=?,bodyweight=?,readiness=?,mood=?,notes=?,fatigue=?,focus=? WHERE id=?',(
             request.form['name'],request.form['date'],request.form.get('duration_min') or 0,request.form.get('bodyweight') or None,request.form.get('readiness') or 7,request.form.get('mood') or 'Good',request.form.get('notes',''),request.form.get('fatigue') or 4,request.form.get('focus') or 7,wid),commit=True)
         for sid in request.form.getlist('set_ids'):
-            q('''UPDATE workout_sets SET weight=?, reps=?, additional_weight=?, duration_seconds=?, distance_m=?, calories=?, avg_hr=?, rounds=?, work_seconds=?, rest_seconds=?, rpe=?, notes=?, set_type=? WHERE id=?''',(
+            # Pobieramy parametry serii z formularza frontendu
+            s_weight = float(request.form.get(f'weight_{sid}', 0) or request.form.get(f'addwt_{sid}', 0) or 0)
+            s_reps = int(request.form.get(f'reps_{sid}', 0) or 0)
+            s_rpe = clean_rpe(request.form.get(f'rpe_{sid}'))
+            
+            # Obliczamy e1RM do zapisu w bazie danych
+            e1rm_val = calculate_e1rm(s_weight, s_reps, s_rpe)
+
+            q('''UPDATE workout_sets SET weight=?, reps=?, additional_weight=?, duration_seconds=?, 
+                        distance_m=?, calories=?, avg_hr=?, rounds=?, work_seconds=?, rest_seconds=?, 
+                        rpe=?, notes=?, set_type=?, estimated_1rm=? WHERE id=?''',(
                 request.form.get(f'weight_{sid}',0) or 0, request.form.get(f'reps_{sid}',0) or 0, request.form.get(f'addwt_{sid}',0) or 0, request.form.get(f'duration_{sid}',0) or 0,
                 request.form.get(f'distance_{sid}',0) or 0, request.form.get(f'calories_{sid}',0) or 0, request.form.get(f'avghr_{sid}',0) or 0,
                 request.form.get(f'rounds_{sid}',0) or 0, request.form.get(f'worksec_{sid}',0) or 0, request.form.get(f'restsec_{sid}',0) or 0,
-                clean_rpe(request.form.get(f'rpe_{sid}')), request.form.get(f'setnotes_{sid}',''), request.form.get(f'settype_{sid}','Working'), sid),commit=True)
+                s_rpe, request.form.get(f'setnotes_{sid}',''), request.form.get(f'settype_{sid}','Working'), e1rm_val, sid), commit=True)
         flash('Workout updated.')
         return redirect(url_for('workout_detail', wid=wid))
     workout = q('SELECT w.*, r.name routine_name FROM workouts w LEFT JOIN routines r ON r.id=w.routine_id WHERE w.id=?',(wid,),one=True)
@@ -2068,7 +2157,7 @@ def athlete_profile():
             full_name, first_name, request.form.get('experience','Intermediate'), request.form.get('primary_goal',''), request.form.get('height_cm') or None, request.form.get('weight_kg') or None, request.form.get('body_fat') or None, request.form.get('bench') or 0, request.form.get('squat') or 0, request.form.get('deadlift') or 0, request.form.get('pullup') or 0, request.form.get('dip') or 0, request.form.get('muscleup') or 0, request.form.get('coach_status','Solo training'), request.form.get('training_age_years') or 0, request.form.get('weekly_target') or 4, request.form.get('equipment','Gym + bodyweight'), request.form.get('training_focus','Strength + skill'), request.form.get('skill_focus','Muscle Up'), request.form.get('recovery_priority','Sleep + fatigue management'), avatar_path, request.form.get('notes','')
         ),commit=True)
         q('UPDATE onboarding_settings SET completed=1, primary_goal=?, experience=?, training_days=?, equipment=?, preferred_style=?, updated_at=CURRENT_TIMESTAMP WHERE id=1', (request.form.get('primary_goal','Strength'), request.form.get('experience','Intermediate'), request.form.get('weekly_target') or 4, request.form.get('equipment','Gym + bodyweight'), request.form.get('training_focus','Strength + skill')), commit=True)
-        flash('Athlete profile updated. Dashboard greeting now uses the first name from Full name.'); return redirect(url_for('athlete_profile'))
+        flash('Athlete profile updated.'); return redirect(url_for('athlete_profile'))
     profile_row=q('SELECT * FROM athlete_profile WHERE id=1',one=True)
     return render_template('athlete.html', profile=profile_row, first_name=first_name_from_profile(profile_row), display_name=first_name_from_profile(profile_row), onboarding=onboarding_state(), level=athlete_level(), readiness=readiness_v2(), compliance=training_compliance(), records=personal_records(8), attributes=rpg_attributes(), weekly=weekly_review_data(), gamification=gamification_state(), daily=athena_daily_score(), intelligence=athlete_intelligence(), achievements=achievement_catalog(), top_skills=q('SELECT * FROM athlete_skills ORDER BY progress DESC,name LIMIT 3'))
 
@@ -2214,35 +2303,60 @@ def previous_similar_workout(workout):
 
 # ---------------- ATHENA 8 Performance Engine ----------------
 def gamification_state():
-    workouts=q('SELECT COUNT(*) c FROM workouts', one=True)['c'] or 0
-    prs=len(personal_records(999))
-    streak=consistency_engine(30)['current']
+    workouts = q('SELECT COUNT(*) c FROM workouts', one=True)['c'] or 0
+    prs = len(personal_records(999))
+    streak = consistency_engine(30)['current']
     try:
-        xp_row=q('SELECT COALESCE(SUM(points),0) v FROM xp_events', one=True)
-        manual=xp_row['v'] if xp_row else 0
+        xp_row = q('SELECT COALESCE(SUM(points),0) v FROM xp_events', one=True)
+        manual = xp_row['v'] if xp_row else 0
     except Exception:
-        manual=0
-    xp=int(manual + workouts*50 + prs*25 + streak*15)
-    level=max(1, xp//250 + 1)
-    progress=xp % 250
-    checks=[('First Session','Log your first workout.', workouts>=1),('10 Workouts','Build a 10-session base.', workouts>=10),('First PR','Record a personal best.', prs>=1),('7-Day Streak','Train or log consistently for 7 days.', streak>=7),('RIS Initiate','Save your first RIS test.', (q('SELECT COUNT(*) c FROM ris_tests', one=True)['c'] or 0)>=1)]
-    return {'xp':xp,'level':level,'progress':progress,'next':250-progress,'badges':[{'title':a,'description':b,'unlocked':c} for a,b,c in checks]}
+        manual = 0
+    total_xp = int(manual + workouts*50 + prs*25 + streak*15)
+    
+    # NOWOŚĆ: użycie dynamicznych poziomów
+    lvl_data = get_level_from_xp(total_xp)
+    talent_points_earned = max(0, lvl_data['level'] - 1)
+    
+    checks = [
+        ('First Session', 'Log your first workout.', workouts >= 1),
+        ('10 Workouts', 'Build a 10-session base.', workouts >= 10),
+        ('First PR', 'Record a personal best.', prs >= 1),
+        ('7-Day Streak', 'Train or log consistently for 7 days.', streak >= 7),
+        ('RIS Initiate', 'Save your first RIS test.', (q('SELECT COUNT(*) c FROM ris_tests', one=True)['c'] or 0) >= 1)
+    ]
+    return {
+        'xp': total_xp, 'level': lvl_data['level'], 'progress': lvl_data['xp_in_level'], 
+        'next': lvl_data['remaining_xp'], 'pct': lvl_data['pct'], 'talent_points': talent_points_earned,
+        'badges': [{'title': a, 'description': b, 'unlocked': c} for a, b, c in checks]
+    }
 
 def athlete_intelligence():
-    r=readiness_v2(); latest=q('SELECT * FROM workouts ORDER BY date DESC LIMIT 1', one=True)
-    fatigue=int((latest['fatigue'] if latest else 4) or 4)
-    recovery=max(0,min(100, round(r['score'] - max(0,fatigue-5)*7)))
-    fatigue_label='Low' if fatigue<=3 else ('Moderate' if fatigue<=6 else 'High')
-    today=datetime.date.today(); week_start=today-datetime.timedelta(days=today.weekday())
-    done=q('SELECT COUNT(*) c FROM workouts WHERE date>=?',(week_start.isoformat(),),one=True)['c'] or 0
-    planned=q('SELECT COUNT(*) c FROM program_days', one=True)['c'] or 0
-    missed=max(0, min(planned, planned-done)) if planned else 0
-    warnings=[]
-    if recovery<55: warnings.append('Recovery is low. Reduce intensity, keep technique crisp, or use a lighter variation.')
-    if fatigue>=7: warnings.append('High fatigue detected. Avoid forced PR attempts today.')
-    if missed>=2: warnings.append(f'{missed} planned sessions appear to be missed this week. Consider a simpler schedule.')
-    if not warnings: warnings.append('Training state looks stable. Build volume gradually and keep RPE honest.')
-    return {'recovery':recovery,'fatigue':fatigue,'fatigue_label':fatigue_label,'readiness':r,'missed':missed,'warnings':warnings}
+    r = readiness_v2()
+    latest = q('SELECT * FROM workouts ORDER BY date DESC LIMIT 1', one=True)
+    fatigue = int((latest['fatigue'] if latest else 4) or 4)
+    recovery = max(0, min(100, round(r['score'] - max(0, fatigue - 5) * 7)))
+    fatigue_label = 'Low' if fatigue <= 3 else ('Moderate' if fatigue <= 6 else 'High')
+    
+    # NOWOŚĆ: Składnik ACWR zintegrowany z modulami Inteligencji
+    acwr = calculate_acwr_status()
+    
+    today = datetime.date.today()
+    week_start = today - datetime.timedelta(days=today.weekday())
+    done = q('SELECT COUNT(*) c FROM workouts WHERE date>=?', (week_start.isoformat(),), one=True)['c'] or 0
+    planned = q('SELECT COUNT(*) c FROM program_days', one=True)['c'] or 0
+    missed = max(0, min(planned, planned - done)) if planned else 0
+    warnings = []
+    if acwr['tone'] in ('warning', 'danger'):
+        warnings.append(acwr['text'])
+    if recovery < 55:
+        warnings.append('Recovery is low. Reduce intensity, keep technique crisp, or use a lighter variation.')
+    if fatigue >= 7:
+        warnings.append('High fatigue detected. Avoid forced PR attempts today.')
+    if missed >= 2:
+        warnings.append(f'{missed} planned sessions appear to be missed this week. Consider a simpler schedule.')
+    if not warnings:
+        warnings.append(f'Training state looks stable. ACWR: {acwr["ratio"]} ({acwr["status"]}). Keep RPE honest.')
+    return {'recovery': recovery, 'fatigue': fatigue, 'fatigue_label': fatigue_label, 'readiness': r, 'missed': missed, 'warnings': warnings, 'acwr': acwr}
 
 def previous_session_map(wid):
     workout=q('SELECT * FROM workouts WHERE id=?',(wid,),one=True)
@@ -2308,7 +2422,7 @@ def onboarding():
 
 @app.route('/weekly-review')
 def weekly_review():
-    return render_template('weekly_review.html', review=weekly_review_data(), smart_plan=smart_today_plan(), catalog=achievement_catalog(), compliance_v2=compliance_engine_v2())
+    return render_template('weekly_review.html', review=weekly_review_data(), smart_plan=smart_today_plan(), catalog=achievement_catalog(), compliance_v2=compliance_engine_v2(), gamification=gamification_state())
 
 
 @app.route('/achievements')
@@ -2428,6 +2542,10 @@ def exercise_progressions_center():
         if r['title']:
             grouped[r['id']]['steps'].append(r)
     return render_template('exercise_progressions.html', groups=grouped.values())
+
+@app.route('/architecture')
+def architecture_info():
+    return render_template('architecture_info.html')
 
 
 # ---------------- ATHENA 11.6 Profile, Skill Tree and Dashboard Intelligence ----------------

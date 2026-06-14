@@ -1,6 +1,142 @@
-{% extends 'base.html' %}{% block title %}Recovery Center{% endblock %}{% block content %}
-<section class="card hero"><p class="eyebrow">ATHENA Recovery Engine</p><h2>Recovery Center</h2><p class="muted">Sleep, energy, soreness, stress and training fatigue translated into practical recovery decisions.</p></section><br>
-<div class="grid cols-4"><div class="card stat"><small>Recovery</small><br><b>{{intelligence.recovery}}/100</b></div><div class="card stat"><small>Readiness</small><br><b>{{readiness.score}}/100</b><span>{{readiness.label}}</span></div><div class="card stat"><small>Fatigue</small><br><b>{{intelligence.fatigue_label}}</b><span>{{intelligence.fatigue}}/10</span></div><div class="card stat"><small>Sleep</small><br><b>{{readiness.sleep}}h</b></div></div><br>
-<div class="grid cols-2"><section class="card advisor {{signal.tone}}"><p class="eyebrow">Recovery decision</p><h3>{{signal.title}}</h3><p>{{signal.text}}</p></section><section class="card"><h3>Recovery trend</h3>{% for p in series[-14:] %}<div class="bar-row"><span>{{p.date}}</span><div><b style="width:{{p.score}}%"></b></div><em>{{p.score}}</em></div>{% else %}<p class="muted">Log Wellness entries to build a recovery trend.</p>{% endfor %}</section></div><br>
-<section class="card"><h3>Recent wellness logs</h3><table><tr><th>Date</th><th>Sleep</th><th>Energy</th><th>Stress</th><th>Soreness</th><th>Mood</th></tr>{% for w in wellness %}<tr><td>{{w.date}}</td><td>{{w.sleep_hours}}</td><td>{{w.energy}}/10</td><td>{{w.stress}}/10</td><td>{{w.soreness}}/10</td><td>{{w.mood}}</td></tr>{% endfor %}</table></section>
+{% extends 'base.html' %}
+{% block title %}Recovery Center{% endblock %}
+{% block content %}
+
+<section class="card hero">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">ATHENA Performance Bio-Engine</p>
+      <h2>Recovery Center & Autonomic Restitution Matrix</h2>
+      <p class="muted">Sleep architecture parameters, psychometric stress variables, and structural myofascial soreness metrics parsed into real-time operational feedback. Manage systemic exhaustion before it downregulates force generation capabilities.</p>
+    </div>
+    <span class="pill status-pill green">Autonomic Bio-Feedback Linked</span>
+  </div>
+</section>
+
+<section class="grid cols-4" style="margin-top: 24px;">
+  <div class="card stat">
+    <small>Systemic Recovery</small>
+    <br><b>{{intelligence.recovery}}/100</b>
+  </div>
+  <div class="card stat">
+    <small>Neurological Readiness</small>
+    <br><b>{{readiness.score}}/100</b><span>{{readiness.label}}</span>
+  </div>
+  <div class="card stat">
+    <small>Accumulated Fatigue</small>
+    <br><b>{{intelligence.fatigue_label}}</b><span>{{intelligence.fatigue}}/10</span>
+  </div>
+  <div class="card stat">
+    <small>Sleep Duration</small>
+    <br><b>{{readiness.sleep}}h</b>
+  </div>
+</section>
+
+<section class="grid cols-2" style="margin-top: 24px;">
+  
+  <article class="card advisor {{signal.tone if signal else 'info'}}" style="margin-bottom: 0;">
+    <p class="eyebrow">Autonomic Decision Layer</p>
+    <h3>{{signal.title if signal else 'All Clear'}}</h3>
+    <p class="muted" style="line-height: 1.5;">{{signal.text if signal else 'Biomechanical markers confirm full muscular readiness.'}}</p>
+  </article>
+
+  <article class="card" style="margin-bottom: 0;">
+    <h3>Microcycle Recovery Trend</h3>
+    <p class="muted" style="margin-bottom: 12px;">Tracking systemic reconstitution scores over the last 14 trailing cycles.</p>
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      {% for p in series[-14:] %}
+        <div class="bar-row" data-tooltip="{{p.date}} — Score: {{p.score}}%">
+          <span>{{p.date}}</span>
+          <div>
+            <b style="width:{{p.score}}%"></b>
+          </div>
+          <em>{{p.score}}</em>
+        </div>
+      {% else %}
+        <p class="muted">Log your daily Wellness Matrix indicators to compute a recovery trend line.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+
+<section class="card" style="margin-top: 24px;">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Bio-Hacking Protocols</p>
+      <h3>Interactive Recovery Manual & Pro-Tips</h3>
+      <p class="muted">Tap on any bio-restitution vector below to reveal advanced sports science strategies and operational protocols to maximize tissue regeneration speed.</p>
+    </div>
+  </div>
+  
+  <div class="info-tip-grid expanded" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 16px;">
+    
+    <button type="button" class="info-tip" data-tip="SLEEP ARCHITECTURE OPTIMIZATION: Prioritize deep sleep (SWS) and REM windows. Block blue light exposure 90 minutes before your planned rest block, ensure your room temperature stays beneath 19°C, and keep a strict consistency anchor in your circadian cycle. SWS handles physical tissue repair, while REM restores neurological performance.">
+      <b>Sleep Architecture</b><span>Circadian rhythm & SWS sync</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="PARASYMPATHETIC ACTIVATION: High cognitive stress channels cortisol, which actively blunts systemic recovery and protein synthesis. Utilize post-workout nasal box-breathing protocols (4s inhale, 4s hold, 4s exhale, 4s hold) for 5 minutes immediately post-session to force your nervous system out of sympathetic fight-or-flight and into deep parasympathetic reconstruction.">
+      <b>Stress & Cortisol Caps</b><span>Parasympathetic upregulation</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="DOMS & SORENESS PROTOCOL: Delayed Onset Muscle Soreness indicates micro-tears in the myofascial matrix, not systemic failure. Avoid aggressive static stretching during peak DOMS as it can increase mechanical tearing. Instead, implement low-intensity steady-state cardio (LISS) or active mobility flows to stimulate target localized blood flow and flush metabolic debris.">
+      <b>Muscular Soreness (DOMS)</b><span>Blood flow promotion over static stretching</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="HYDRO-ELECTROLYTE MATRIX: Dehydration drops blood volume, reducing the efficiency of oxygen and nutrient delivery to recovering muscle tissues. Ensure a baseline intake of 35-40ml of water per kg of bodyweight, anchored with sodium, magnesium, and potassium ions during high-sweat training sessions to avoid neural signaling dropouts.">
+      <b>Hydration & Electrolytes</b><span>Fluid dynamics & nutrient transport</span>
+    </button>
+    
+    <button type="button" class="info-tip" data-tip="CONTRAST HYDROTHERAPY: Alternate between hot water exposures (38-40°C) for 3 minutes and cold water immersion (10-14°C) for 1 minute across 3-4 structural cycles. This forces rapid blood vessel vasoconstriction and vasodilation, creating a powerful circulatory pump that drives inflammatory markers away from stressed joints.">
+      <b>Contrast Therapy</b><span>Vascular pumping matrix</span>
+    </button>
+
+  </div>
+  
+  <p id="recoveryTipText" class="tip-output" style="margin-top: 16px;">Tap any bio-restitution vector component above to decode its operational training execution guidelines.</p>
+</section>
+
+<section class="card" style="margin-top: 24px;">
+  <div class="section-head">
+    <h3>Recent Wellness Diagnostic Logs</h3>
+  </div>
+  
+  <div class="table-scroll" style="margin-top: 14px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Execution Date</th>
+          <th>Sleep Hours</th>
+          <th>Energy Matrix</th>
+          <th>Stress Burden</th>
+          <th>Soreness Index</th>
+          <th>Subjective Mood</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for w in wellness %}
+          <tr>
+            <td>{{w.date}}</td>
+            <td><b>{{w.sleep_hours}}h</b></td>
+            <td><span class="pill green">{{w.energy}}/10</span></td>
+            <td>{{w.stress}}/10</td>
+            <td>{{w.soreness}}/10</td>
+            <td>{{w.mood}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+document.querySelectorAll('.info-tip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const outputBox = document.getElementById('recoveryTipText');
+    if (outputBox) {
+      outputBox.textContent = btn.dataset.tip;
+    }
+  });
+});
+</script>
+
 {% endblock %}
