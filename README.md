@@ -1,187 +1,65 @@
-# ATHENA Training Tracker - Flask Product Demo
+# ATHENA — Strength & Calisthenics Intelligence Ecosystem (MVP)
 
-Gotowy do prezentacji moduł trackera treningów inspirowany ATHENA / Strength RIS.
+ATHENA is an advanced, data-driven training, biometric logging, and athletic lifestyle tracking platform engineered specifically for strength lifters, streetlifting competitors, and calisthenics practitioners. 
 
-## Najważniejsze funkcje
+Named after the ancient Greek goddess of wisdom and systematic execution, the platform’s core philosophy is to transition athletes away from blind, uncalculated training habits. Instead, ATHENA provides users with data-driven logic, calculated recovery indices, and gamified mastery frameworks.
 
-- Dashboard z liczbą treningów, serii, objętością i ostatnią wagą ciała
-- Exercise Library z kartami ćwiczeń, zdjęciami i popupem szczegółów
-- Dodawanie/edycja ćwiczeń oraz upload własnych zdjęć
-- Routines: gotowe zestawy ćwiczeń do szybkiego uzupełnienia
-- Workout Logger: historia treningów, edycja serii, notatki, RPE, mood, fatigue, focus i bodyweight
-- Wellness tracking: masa ciała, sen, energia, stres, soreness
-- Hevy Import:
-  - iteracja po wszystkich stronach `page=1..page_count`, więc import nie kończy się na pierwszych 10 rekordach,
-  - import `weight_kg` z `/v1/body_measurements`,
-  - przypisanie wagi do treningu z tej samej daty albo ostatniej znanej wcześniejszej daty,
-  - pomijanie duplikatów po `hevy_id`,
-  - tryb demo i import JSON bez klucza API.
+This repository contains a fully functional, full-stack Minimum Viable Product (MVP) built using **Python, Flask, and SQLite3**, wrapped in a responsive frontend layout designed to prevent performance bottlenecks and visual instabilities.
 
-## Uruchomienie
+---
 
-### Windows
+## 🧭 Technical Architecture & Data Workflow
 
-```bat
-run.bat
-```
-
-### macOS / Linux
-
-```bash
-chmod +x run.sh
-./run.sh
-```
-
-Następnie otwórz:
-
-```text
-http://127.0.0.1:5000
-```
-
-## Hevy API
-
-Aplikacja obsługuje realną ścieżkę importu z Hevy API. Wklej klucz w ekranie importu albo ustaw zmienną środowiskową:
-
-```bash
-export HEVY_API_KEY="your-key"
-```
-
-Importer pobiera:
-
-```text
-GET /v1/workouts?page=1&limit=10
-GET /v1/body_measurements?page=1&limit=10
-```
-
-i kontynuuje pobieranie do `page_count` lub do limitu bezpieczeństwa ustawionego w UI.
-
-## Naprawa SQLite
-
-Tworzenie nowego treningu działa w transakcji przez `lastrowid`, bez `RETURNING id`. Aplikacja wykonuje migracje przy starcie, więc starsza baza demo nie powinna powodować `OperationalError`.
-
-## Polishing update
-
-This version adds a more ATHENA-like gym interface: darker sport palette, green/gold performance accents, short loading screens between tabs, and a dedicated RIS Lab.
-
-### RIS Lab
-
-The RIS Lab lets the user enter sex formula, bodyweight and strength total. The app calculates and stores the RIS score in SQLite, then shows score history and categories:
-
-- Foundation
-- Developing
-- Strong
-- Advanced
-- Elite
-
-### ATHENA Coach Signal
-
-The dashboard now includes a simple session advisor. It reads recent readiness, fatigue, focus and latest RIS score to suggest whether the user should push, maintain or recover.
-
-## Latest UI/RIS revision
-- RIS Lab now supports two modes: **ALL-4** (pull-up, dip, squat, muscle-up) and **UPPER** (pull-up, dip).
-- Total is calculated automatically from the selected mode.
-- Exercise placeholder graphics were recolored to ATHENA green/gym palette.
-- Decorative UI circles no longer block clicks on selects, inputs or buttons.
-- Added a product idea: a future Test Day Checklist for judging standards and video evidence.
+The application operates on a strict separation of concerns, ensuring high data density and fast processing speeds.
 
 
-## RIS correction update
-- ALL-4 uses the public RIS 2025 formula structure with official constants shown on warisradji.com/ris.
-- UPPER is clearly marked as an ATHENA demo extension for pull-up + dip only.
-- Example check: Men, 88 kg BW, 60 kg pull-up + 90 kg dip gives about 70 RIS in UPPER mode, not about 29.
-- The RIS page works as a calculator and saved calculations appear in history.
+### 1. Frontend Execution Shell (`/templates`)
+* **Reusable Templating (Jinja2):** Core navigation sidebars, athlete dashboards, and global headers are split into isolated server-side snippets to maximize code reusability and component structure.
+* **Layout Shift Prevention:** Structured using a flexible, modern **Full-Width Stacked Row** grid layout. Content expansions and technical details expand down vertically, ensuring complete visual stability across mobile viewports and desktop monitors.
+* **Async Event Handling (Vanilla JS):** Uses highly targeted client-side event listeners to process dynamic elements, micro-interactions, and instant content updates without forcing costly full-page browser refreshes.
 
+### 2. Backend Processing Core & Database
+* **Flask Runtime (Python):** Handles application routing rules, form payload data parsing, parameters verification, and sports-science algorithms.
+* **SQLite3 Relational Database:** Manages historical logs, calculated strength progressions, user states, and unlocked badges across clean, structured database tables.
 
-## Coefficient inspiration
-The RIS Lab is based on the public RIS formula pattern. The app also mentions Wilks, DOTS and IPF GL as examples of strength-sport coefficient systems used to compare athletes with different bodyweights. In this demo, UPPER is not official RIS - it is an ATHENA product extension for pull-up + dip testing.
+---
 
-## Latest update - Exercise Type System
+## 🖥️ System Blueprint & Module Breakdown
 
-The workout logger now supports multiple exercise models, not only weight + reps:
+The application is structured around specific functional views, each handling a dedicated part of the athlete’s data profile:
 
-- Strength - weight and repetitions
-- Bodyweight - added weight and repetitions
-- Timed - duration, with optional added load
-- Distance - load and distance
-- Cardio - duration, distance, calories and average heart rate
-- Interval - rounds, work time and rest time
-- Mobility - duration and notes
-- Custom - mixed fields
+### 1. Athlete Core & Gamification Matrix
+* **Dashboard (`dashboard.html`):** The central hub displaying the **ATHENA Score** (a dynamic 0-100% daily readiness metric calculated by balancing recent workouts against lifestyle logs), weekly summary cards, and active **Daily Missions (Quests)**.
+* **Athlete Profile (`athlete_profile.html`):** Works like an RPG character sheet. Tracks unified profile levels, **Experience Points (XP)**, and maps athletic data into five live character attributes: *Strength, Skill, Recovery, Consistency, and Power*. Includes personalization fields for weight, height, and manual liftoff metrics.
+* **Goals & Challenges (`goals.html`):** A practical setup where users define numeric targets and metrics. The system dynamically monitors inputs and generates live progress bars and permanently unlocks rare/epic achievement badges for consistency.
 
-Exercise Library includes more demo movements: Dip, Treadmill Run, Rowing Machine, Farmer Walk, Sprint Intervals, Mobility Flow and Dead Hang. The workout detail screen changes input fields automatically based on exercise type.
+### 2. Training Telemetry & Skill Systems
+* **Workouts Module (`workouts.html`):** The master log displaying historical workout timelines sorted by date. Features a **Hevy API Import Simulation**—a blueprint routing script prepared to automatically map and ingest training payloads from the external *Hevy* fitness application.
+* **Exercise Library (`exercises.html`):** A custom database repository where users can edit movements, create custom compound exercises, define target muscles, and track weight progression or volume charts.
+* **Skill Trees 2.0 (`skills.html`):** A dedicated calisthenics skill-tree management system. It breaks down complex movements (like *Muscle Ups* or *Human Flags*) into precise, step-by-step **Progression Nodes**. Features an **Evidence Upload Form** directly inside the layout to back up unlocked nodes with image proof and execution notes.
 
-A new Personal Records page calculates best performances across all exercise categories.
+### 3. Analytics, Intelligence & Business Strategy
+* **RIS Lab (`ris_lab.html`):** An index computer executing the 2025 *Relative Index for Streetlifting* metrics. It calculates an athlete's true strength relative to their size by comparing total payload outputs against non-linear bodyweight expected curves. Supports **ALL-4** and **UPPER** test configurations and saves data to a local timeline.
+* **Recovery Center (`recovery_center.html`):** Tracks daily biometric parameters including sleep hours, baseline energy, stress markers, and muscle soreness logs to update the global dashboard algorithms.
+* **Athlete Intelligence (`intelligence.html`):** An educational knowledge base running dynamic sports-science pills. Tapping on concepts like *RPE/RIR Intensity Scales* or *Deload Frameworks* instantly injects coaching definitions using client-side JavaScript.
+* **Coaching Marketplace (`coaching_locked.html`):** A premium, locked monetization preview. It maps out a future decentralized commercial roadmap where independent trainers can join the platform and distribute custom programs via 3 subscription tiers (**Tier 1, 2, and 3**).
+* **Architecture Info (`architecture_info.html`):** System manual detailing frontend/backend specifications alongside the **Product Identity & Mythology Genesis** that outlines why the application was named ATHENA.
 
+---
 
-## Product expansion added
+## 🔄 The Data Lifecycle Loop
 
-This version includes:
-- Workout Timeline with searchable history.
-- ATHENA heatmap for training consistency.
-- Exercise Progress screens with per-exercise history.
-- Custom Exercise Tags in the library.
-- Global Smart Search across workouts, exercises and routines.
-- Routine Builder with Start Workout action.
-- Session Score formula: readiness 35% + focus 25% + low fatigue 20% + mood 15% + duration discipline 5%.
-- Muscle Group Analytics with SVG anatomy-style body map.
-- Bodyweight timeline using wellness and Hevy body measurement data.
-- Goals and Achievements center.
-- Unified green ATHENA exercise image placeholders.
+Every transactional event inside the application utilizes a specific, closed data lifecycle loop:
 
-## UI revision update
+1. **Capture:** The athlete submits inputs via a responsive frontend HTML5 form or an interactive JavaScript grid element.
+2. **Transmit:** Web triggers bundle variables into an HTTP POST payload directed to the backend endpoints.
+3. **Compute:** The Flask controller captures the payload, executes corresponding algorithms (such as the RIS index calculation, Brzycki equation, or XP level curve checks), and formats a parameterized SQL call.
+4. **Persist:** The system performs a transactional write, committing the data into the local SQLite3 database file.
+5. **Update:** The Jinja2 templating engine handles server-side rendering, dynamically updating the tracking bars and visual numbers on the user's interface with zero visual friction.
 
-This build includes a cleaner ATHENA UI pass:
+---
 
-- compact Workout Timeline heatmap with hover details,
-- cleaner Smart Search layout and search bar,
-- hover tooltips on heatmap, bodyweight chart, progress charts and muscle bars,
-- Three.js anatomy muscle map with SVG fallback,
-- simplified unified exercise graphics in the Exercise Library,
-- reduced visual clutter in Workouts and Analytics.
-
-## Latest UI/Product Update
-
-This build adds:
-
-- cleaned Workouts screen with compact timeline cards,
-- compact heatmap with hover tooltips,
-- command palette search from the top bar using the magnifier or Ctrl+K,
-- interactive search results linking directly to workouts, exercises, routines and goals,
-- anatomical SVG muscle map instead of the previous Three.js demo,
-- improved Goals layout with spacing between modules,
-- richer demo database with 38 workouts across recent weeks and months,
-- unified exercise illustrations in the ATHENA green sport style.
-
-The app is still fully local and runs on Flask + SQLite.
-
-
-## Latest polish update
-- Removed the rough anatomical map and kept analytics as clean, separate modern UI modules.
-- Added editable goals: change values, target, status, notes, complete or reopen goals.
-- Personal Records now link to the exact workout where the record was achieved.
-- Exercise Library now uses one unified ATHENA exercise lab SVG placeholder across all exercises.
-
-## Premium feature update
-
-This package adds a wider ATHENA Training OS layer:
-
-- Workout Replay - session timeline with sets, time markers and summary metrics.
-- Quick Start Workout - dashboard shortcuts to continue the last session or start from a routine.
-- Floating Workout Logger - quick action available while editing a workout.
-- Workout Comparison - current session vs previous session with the same name.
-- ATHENA Readiness v2 - one consistent formula using sleep, energy, stress, soreness and hydration.
-- Bodyweight Center - timeline built from wellness and Hevy body measurement imports.
-- RIS History - saved ALL-4 / UPPER RIS tests with trend visualization.
-- ATHENA Level and Consistency Engine - simple product-style athlete profile score.
-- Command Palette 2.0 - Ctrl+K actions for starting workouts, opening RIS, Hevy import, templates, bodyweight and coach preview.
-- Workout Templates Marketplace - predefined ATHENA routines ready to start.
-- Coaching Module - locked preview of future coach/athlete capability, without a separate coach dashboard.
-- Exercise Progress remains linked to each movement, while PR cards link back to the source workout.
-- Unified exercise SVG system - every exercise has a clean ATHENA-style placeholder image.
-
-The app still runs locally with Flask and SQLite. Start it with:
-
-```bash
-pip install -r requirements.txt
-python app.py
-```
+## 🚀 Future Development Roadmap
+* **Production API Hooks:** Transitioning the *Hevy Import* system from a sandboxed demo script into a production OAuth2 API connection.
+* **Drag-and-Drop Program Builder:** Activating the interactive routine builder templates to support customizable, multi-week workout calendar generation.
+* **Multi-Tenant Relational Schema:** Expanding database foreign keys to map separate athlete records directly to verified personal trainer rosters.
